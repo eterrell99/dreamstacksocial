@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import useGetUser from "../Dashboard/getUser";
 import axios from "axios";
+import api from "../Services/token_refresh"
 import Navbar from "../Site/Navbar/Navbar";
+
 import {
   Container,
   Typography,
@@ -13,7 +15,13 @@ import {
   Box,
   Button,
   TextField,
+  
 } from "@material-ui/core";
+
+import { TryOutlined } from "@mui/icons-material";
+import PostList from "./userPosts";
+
+
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -30,8 +38,8 @@ const useStyles = makeStyles((theme) => ({
     margin: theme.spacing(2),
   },
   divider: {
-    marginTop: theme.spacing(2),
-    marginBottom: theme.spacing(2),
+    marginTop: theme.spacing(1),
+    marginBottom: theme.spacing(1),
   },
   editField: {
     marginBottom: theme.spacing(2),
@@ -41,10 +49,11 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function Profile() {const email = localStorage.getItem("email");
+export default function Profile() {
+const email = localStorage.getItem("email");
 const access = localStorage.getItem("access");
 const classes = useStyles();
-
+const [userPosts, setUserPosts] = useState();
 const { userData, loading, error } = useGetUser(email, access);
 
 const [editMode, setEditMode] = useState(false);
@@ -63,7 +72,7 @@ const handleEditClick = () => {
 const handleSaveClick = async () => {
   try {
     const updateUserUrl = `/api/user/${userData.id}/`;
-    const response = await axios.patch(updateUserUrl, editedData, {
+    const response = await api.patch(updateUserUrl, editedData, {
       headers: {
         Authorization: `Bearer ${access}`,
       },
@@ -92,6 +101,27 @@ const handleInputChange = (e) => {
     [name]: value,
   });
 };
+useEffect(() => {
+  const fetchUserPosts = async () => {
+    try {
+      if (userData && userData.id) {
+        const response = await api.get(`/post/user/${userData.id}/`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('access')}`,
+          },
+        });
+        setUserPosts(response.data);
+      } else {
+        console.error("User data or user ID is null or undefined.");
+      }
+    } catch (error) {
+      console.error("Error fetching posts:", error);
+      // Handle the error as needed
+    }
+  };
+
+  fetchUserPosts();
+}, [userData]);
 
 if (loading) {
   return <div>Loading...</div>;
@@ -102,47 +132,45 @@ if (error) {
 }
   return (
     <div><Navbar/>
-    <Container maxWidth="md">
-      
+    <Container maxWidth="md"> 
       <Paper className={classes.paper} elevation={3}>
-        <Avatar className={classes.avatar} src={editedData.profile_pic} >{editedData.first_name ? editedData.first_name.charAt(0) : ""}</Avatar>
-        <Typography variant="h4" gutterBottom>
-          {editMode ? (
-            <div>
-            <TextField
-              name="first_name"
-              value={editedData.first_name}
-              onChange={handleInputChange}
-              className={classes.editField}
-              label="First Name"
-            />
-            <Divider className={classes.divider} />
-            <TextField
-              name="last_name"
-              value={editedData.last_name}
-              onChange={handleInputChange}
-              className={classes.editField}
-              label = "Last Name"
-            />
-            </div>
-          ) : (
-            `${editedData.first_name} ${editedData.last_name}`
-          )}
-        </Typography>
-        <Typography variant="subtitle1" gutterBottom>
-          Username: {userData.username}
-        </Typography>
-        <Typography variant="subtitle1" gutterBottom>
-          Email: {userData.email}
-        </Typography>
-        <Divider className={classes.divider} />
-        <Typography variant="subtitle1" gutterBottom>
+        <Grid container spacing={2} direction="row" justifyContent="flex-start"
+  alignItems="center">
+          <Grid item>
+            <Avatar className={classes.avatar} src={editedData.profile_pic} >{editedData.first_name ? editedData.first_name.charAt(0) : ""}</Avatar>
+          </Grid>
+          <Grid item>  
+            <Typography variant="h4" gutterBottom>
+            {editMode ? (
+              <div>
+              <TextField
+                name="first_name"
+                value={editedData.first_name}
+                onChange={handleInputChange}
+                className={classes.editField}
+                label="First Name"
+              />
+              <Divider className={classes.divider} />
+              <TextField
+                name="last_name"
+                value={editedData.last_name}
+                onChange={handleInputChange}
+                className={classes.editField}
+                label = "Last Name"
+              />
+              </div>
+            ) : (
+              `${editedData.first_name} ${editedData.last_name}`
+            )}
+          </Typography>
+          </Grid>
+          <Grid item>
+          <Typography variant="subtitle1" gutterBottom>
           Date Joined: {new Date(userData.date_joined).toLocaleString()}
         </Typography>
-        <Typography variant="subtitle1" gutterBottom>
-          Last Login: {new Date(userData.last_login).toLocaleString()}
-        </Typography>
-        <Divider className={classes.divider} />
+          </Grid>
+        </Grid>
+
         {editMode ? (
           <TextField
             name="bio"
@@ -201,7 +229,10 @@ if (error) {
           >
             Edit Profile
           </Button>
+          
         )}
+        <Divider className={classes.divider} />
+        {userPosts ? (<PostList posts={userPosts}/>) : (<div></div>)}
       </Paper>
     </Container>
     </div>

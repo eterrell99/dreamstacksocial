@@ -2,7 +2,7 @@ from rest_framework_bulk import (BulkListSerializer,BulkSerializerMixin,)
 from .models import Posts, Comment, Tag, PostLikes, CommentLikes,File
 from rest_framework import serializers
 from UserApp.serializers import UserSerializer
-
+import json
 class TagSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tag
@@ -19,7 +19,7 @@ class PostSerializer(serializers.ModelSerializer):
     comment_count = serializers.SerializerMethodField()
     user = UserSerializer()
     user_has_liked = serializers.SerializerMethodField()
-    tags = TagSerializer()
+    tags = TagSerializer(many=True)
     files = FileSerializer(many=True, read_only=True)
     
     def get_user_has_liked(self, obj):
@@ -33,6 +33,10 @@ class PostSerializer(serializers.ModelSerializer):
     
     def get_comment_count(self, obj):
         return obj.comments.count()  # Count the number of comments
+    
+
+
+
     
     class Meta:
         model = Posts
@@ -82,24 +86,29 @@ class CreateCommentSerializer(serializers.ModelSerializer):
 class CreatePostSerializer(serializers.ModelSerializer):
     user = serializers.ReadOnlyField(source='user.username')
     files = FileSerializer(many=True, required=False)
+    tags = serializers.ListField(write_only=True, required=False)
 
     class Meta:
         model = Posts
         fields = '__all__'
 
     def create(self, validated_data):
-        # Handle file data separately if provided
-        files_data = validated_data.pop('files', [])
-        print('test')
-        post_instance = super(CreatePostSerializer, self).create(validated_data)
+        # Extract and remove tags from the validated data
+        tags_data = validated_data.pop('tags', [])
+        
+        # Create or retrieve existing tags
+        print(tags_data)
+        plaintags = json.loads(tags_data[0])
+        tags = []
+        for tag_data in plaintags:
+            tag, created = Tag.objects.get_or_create(**tag_data)
+            tags.append(tag)
 
-        # Process and create files associated with the post
-        for file_data in files_data:
-            # Assuming File model is used for handling files
-            File.objects.create(post=post_instance, **file_data)
-
-        return post_instance
-
+        # Create the post with the remaining data
+        post = super(CreatePostSerializer, self).create(validated_data)
+        # Set the tags for the post
+        post.tags.set(tags)
+        return post
 class CommentSerializer(serializers.ModelSerializer):
     comment_count = serializers.SerializerMethodField()
     like_count = serializers.SerializerMethodField() 

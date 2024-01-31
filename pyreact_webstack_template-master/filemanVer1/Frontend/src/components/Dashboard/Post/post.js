@@ -27,7 +27,7 @@ import ReplyIcon from '@mui/icons-material/Reply';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Add } from "@mui/icons-material";
 import ListItemIcon from '@mui/material/ListItemIcon';
-
+import TestTag from "./testTag";
 const formatDate = (timestamp) => {
   const date = new Date(timestamp);
   const day = date.getDate().toString().padStart(2, "0");
@@ -219,6 +219,7 @@ const Post = ({ post, thread }) => {
           
         </Grid>  
         <Typography variant="h6">{title}</Typography>
+        <TestTag postID={1}/>
         
         {files.length > 0 ? (<ImageViewer files={files} />) : <div></div> }
         <Typography variant="body1">{text}</Typography>
@@ -241,7 +242,7 @@ const Post = ({ post, thread }) => {
 
         <div className={classes.actions}>
           <div>
-
+              
             {hasLiked ? (
             <IconButton onClick={handleLikeClick}>
               <FavoriteIcon color="primary" />

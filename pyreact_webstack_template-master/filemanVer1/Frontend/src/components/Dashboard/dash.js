@@ -4,7 +4,7 @@ import getUser from "./getUser";
 import Post from "./Post/post";
 import api from "../Services/token_refresh";
 import TagsList from "./TagList";
-
+import TagSearch from "./tagSearch";
 import {
   Card,
   CardContent,
@@ -37,7 +37,7 @@ export default function Dash() {
     const [postText, setPostText] = useState();
     const [titleText, setTitleText] = useState();
     const [formData, setFormData]= useState({});
-
+    const [selectedTags, setSelectedTags] = useState();
 
 
     // 
@@ -50,17 +50,16 @@ export default function Dash() {
       if (postText && titleText) {
         try {
           // Step 1: Create the post and get the post ID
-          const postResponse = await api.post(
-            'post/create/',
-            { title: titleText, text: postText, files: {...selectedFiles} },
-            {
-              headers: {
-                'Content-Type': 'multipart/form-data',
-                'filename':   selectedFiles[0],
-                Authorization: `Bearer ${localStorage.getItem('access')}`,
-              },
-            }
-          );
+          const postFormData = new FormData();
+          postFormData.append('title', titleText);
+          postFormData.append('text', postText);
+          console.log(selectedTags);
+          postFormData.append('tags',JSON.stringify(selectedTags))
+          const postResponse = await api.post('post/create/', postFormData, {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('access')}`,
+            },
+          });
     
           const postId = postResponse.data.id;
     
@@ -75,7 +74,6 @@ export default function Dash() {
             // Step 4: Send a separate request for each file
             await api.post('files/', fileFormData, {
               headers: {
-                'Content-Type': 'multipart/form-data',
                 Authorization: `Bearer ${localStorage.getItem('access')}`,
               },
             });
@@ -194,7 +192,10 @@ export default function Dash() {
           sx={{padding:'10px', witdh:'90vw'}}
         />
         <div style={{padding:'10px'}}>
-        <Grid container direction="row" justifyContent="center" alignItems="center">
+        <Grid container spacing={1} direction="row" justifyContent="center" alignItems="center">
+        <Grid item>
+        <TagSearch tags={topTags} hoistTags={setSelectedTags}/>
+         </Grid>
         <Grid item><Button variant={"outlined"} startIcon={<DeleteIcon/>} onClick={(e)=> discardNewPost(e)}>Discard</Button>
         </Grid>
         <Grid item>

@@ -10,7 +10,8 @@ app_name= 'DashboardApp'
 router = routers.SimpleRouter()
 
 urlpatterns = [   
-   path('post/', GenericPostAPIView.as_view()),                                                                                 
+   path('post/', GenericPostAPIView.as_view()), 
+   path('post/user/<int:id>/', PostsByUserView.as_view()),                                                                                
    path('comment/<int:id>/', CommentDetailView.as_view()),
    path('comment/', CommentListView.as_view()),
    path('post/top/', TopLikedPostsView.as_view(), name='top-liked-posts'),

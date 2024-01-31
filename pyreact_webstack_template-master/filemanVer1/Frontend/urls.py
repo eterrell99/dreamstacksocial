@@ -6,6 +6,8 @@ urlpatterns = [
     path('signup/', index),
     path('login/', index),
     path('profile/', index),
-    path('post/<int:id>/',index )
+    path('post/<int:id>/',index ),
+    path('ee/',index),
+    path('ee/<str:eeID>/', index)
 
 ]

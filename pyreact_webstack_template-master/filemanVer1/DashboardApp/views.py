@@ -14,6 +14,7 @@ from .models import Posts, Comment, Tag, PostLikes
 from django.db import models
 from rest_framework.parsers import MultiPartParser, FileUploadParser
 
+from rest_framework import filters
 
 
 class FileUploadView(generics.GenericAPIView, mixins.ListModelMixin):
@@ -40,10 +41,11 @@ class FileUploadView(generics.GenericAPIView, mixins.ListModelMixin):
 class GenericPostAPIView(generics.GenericAPIView, mixins.ListModelMixin, mixins.CreateModelMixin, mixins.UpdateModelMixin, mixins.RetrieveModelMixin, mixins.DestroyModelMixin):
     authentication_classes = [JWTAuthentication]
     permission_classes = [AllowAny]  # You can restrict access as needed
-
     serializer_class = PostSerializer
     queryset = Posts.objects.all()
     lookup_field = 'id'
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['title', 'text']
     def get(self, request):
         id_param = request.query_params.get('id')
         
@@ -201,6 +203,8 @@ class TopLikedCommentsView(ListAPIView):
 class MostPopularTagsView(ListAPIView):
     queryset = Tag.objects.annotate(total_posts=models.Count('posts')).order_by('-total_posts')
     serializer_class = TagSerializer
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['name']
 
 class CommentCreateView(generics.CreateAPIView):
     serializer_class = CreateCommentSerializer
@@ -215,22 +219,25 @@ class PostCreateView(APIView):
     parser_classes = (MultiPartParser, FileUploadParser)
     serializer_class = CreatePostSerializer
     authentication_classes = [JWTAuthentication]
-    permission_classes = [AllowAny]
-    
+    permission_classes = [IsAuthenticated]
+
     def post(self, request):
-        print(request.data)
         serializer = CreatePostSerializer(data=request.data)
-        #if request.data['files']:
 
         if serializer.is_valid():
-            # Automatically set the user from the request's authentication
-            serializer.validated_data['user'] = request.user
-            serializer.validated_data['files'] = request.data['files']
-            serializer.save()
+            serializer.save(user=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        
+
+
+class PostsByUserView(ListAPIView):
+    serializer_class = PostSerializer
+
+    def get_queryset(self):
+        user_id = self.kwargs['id']
+        return Posts.objects.filter(user_id=user_id)
+    
 
 class SearchView(APIView):
     def get(self,request):
