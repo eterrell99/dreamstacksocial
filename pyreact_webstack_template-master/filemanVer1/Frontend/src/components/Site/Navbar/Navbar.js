@@ -8,6 +8,7 @@ import {
   Menu,
   MenuItem,
   makeStyles,
+  Avatar
 } from "@material-ui/core";
 import { AccountCircle } from "@mui/icons-material";
 import LogoutIcon from '@mui/icons-material/Logout';
@@ -15,6 +16,8 @@ import api from "../../Services/token_refresh";
 import { useNavigate } from "react-router-dom";
 import SearchBar from "./SearchBar";
 import Grid from "@material-ui/core/Grid";
+import getUser from "../../Dashboard/getUser";
+import Inventory2Icon from '@mui/icons-material/Inventory2';
 const useStyles = makeStyles((theme) => ({
     title: {
       flexGrow: 1,
@@ -36,11 +39,14 @@ const useStyles = makeStyles((theme) => ({
     },
   }));
 
-export default function Navbar() {
+export default function Navbar( {expanded, setExpanded}) {
+  const email = localStorage.getItem("email");
+  const access = localStorage.getItem("access");
   const [loggedIn, setLoggedIn] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const classes = useStyles();
   const navigate = useNavigate();
+  const { userData, loading, error } = getUser(email, access);
   useEffect(() => {
     // Check if the user is logged in
     const checkLoginStatus = async () => {
@@ -104,8 +110,15 @@ export default function Navbar() {
     // Redirect or show a confirmation message
   };
 
+  const handleLogin = () => {
+    navigate('/login/');
+  }
+  const handleSignUp = () => {
+    navigate('/signup/')
+  }
+
   return (
-    <div>
+    <div style={{marginLeft: expanded ? "200px":"0"}}>
       <AppBar position="static">
         <Toolbar >
           <Grid container direction="row"
@@ -120,20 +133,41 @@ export default function Navbar() {
           {loggedIn ? (
             <>
               <Grid item>
+              <Button onClick={() => setExpanded(!expanded)}>
+                <Inventory2Icon />
+              </Button> 
+              </Grid>
+              <Grid item>
                 <SearchBar/>
               </Grid>
-
+              
               <Grid item>
-              <IconButton
+
+              <Button
                 color="inherit"
                 onClick={handleMenuOpen}
                 edge="end"
                 aria-label="account of current user"
                 aria-haspopup="true"
-                className={classes.menuButton}
+                endIcon={userData ? (<Avatar src={userData.profile_pic}>{userData.profile_pic ? "":  userData.first_name.charAt(0)}</Avatar>
+                ):(<AccountCircle  />)}
+                
               >
-                <AccountCircle />
-              </IconButton>
+            <Grid
+              container
+              direction="row"
+              justifyContent="center"
+              alignItems="center"
+              sx={{spacing:2}}
+            >
+            <Grid item>
+              <Typography>{userData? (userData.first_name): ("")}</Typography>
+              </Grid>
+              
+            </Grid>
+            
+            
+              </Button>
               
               <Menu
                 anchorEl={anchorEl}
@@ -146,7 +180,7 @@ export default function Navbar() {
                   className={classes.menuItem}
                 >
                   <AccountCircle className={classes.menuIcon} />
-                  Profile
+                   Profile
                 </MenuItem>
                 <MenuItem
                   onClick={handleLogout}

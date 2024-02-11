@@ -18,6 +18,7 @@ urlpatterns = [
    path('comment/top/', TopLikedCommentsView.as_view(), name='top-liked-comments'),
    path('comment/top/<int:post_id>/', TopLikedCommentsForPostView.as_view(), name='top-liked-comments-for-post'),
     path('tag/top/', MostPopularTagsView.as_view(), name='most-popular-tags'),
+    path('tag/<str:tag_name>/', TagRetrieveView.as_view()),
     path('post/<int:id>/like/', GenericPostLikeAPIView.as_view(), name='PostLikeAPIView'),
     path('comment/<int:id>/like/',GenericCommentLikeAPIView.as_view(), name='CommentLikeAPIView'),
     path('comment/create/', CommentCreateView.as_view(), name='commentCreate'),
@@ -25,4 +26,7 @@ urlpatterns = [
     path('files/', FileUploadView.as_view()),
     path('search/', SearchView.as_view()),
     path('', include(router.urls)),
+    path('posts/bytag/<str:tag_name>/', PostsByTagView.as_view(), name='posts-by-tag'),
+    path('posts/<int:id>/sv/', GenericPostSaveAPIView.as_view()),
+    path('posts/usrsv/', UserPostSavesView.as_view())
    ]

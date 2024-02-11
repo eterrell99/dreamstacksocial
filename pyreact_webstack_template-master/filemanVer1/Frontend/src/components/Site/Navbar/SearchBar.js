@@ -59,22 +59,36 @@ export default function SearchBar() {
             }
         }
     
-        if (searchResults && searchResults['users']) {
-            // Check if 'users' property exists and is an array
-            if (Array.isArray(searchResults['users']['first_name'])) {
-                searchResults['users']['first_name'].forEach((user) => {
-                    // Check if 'username' property exists
-                    if (user.first_name) {
-                        uniqueUsers.set(user.id, user);
-                    }
-                });
-            }
-        }
+        
     
         // Convert the map values back to an array
         
         return Array.from(uniqueUsers.values());
     };
+    const getUniquePosts = () => {
+        const uniquePosts = new Map();
+    
+        if (searchResults && searchResults['posts']) {
+            // Check if 'users' property exists and is an array
+            if (Array.isArray(searchResults['posts']['title'])) {
+                searchResults['posts']['title'].forEach((post) => {
+                    // Check if 'username' property exists
+                    if (post.title) {
+                        uniquePosts.set(post.id, post);
+                    }
+                });
+            }
+        }
+    
+        
+    
+        // Convert the map values back to an array
+        
+        return Array.from(uniquePosts.values());
+    };
+
+
+
     return (
         <div>
             <List
@@ -87,7 +101,7 @@ export default function SearchBar() {
             >
                 <ListItem alignItems="flex-start">
                     <InputBase
-                        sx={{ ml: 1, flex: 1, maxHeight: '25px' }}
+                        sx={{ ml: 1, flex: 1, maxHeight: '25px', minWidth: '300px',maxWidth:'600px', }}
                         placeholder="Search"
                         inputProps={{ 'aria-label': 'search' }}
                         onChange={(e) => handleSearchQuery(e)}
@@ -125,6 +139,13 @@ export default function SearchBar() {
                                     <ListItemText primary={`Users ${getUniqueUsers().length}`} />
                                     {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
                                 </ListItemButton>
+                                <ListItemButton onClick={handleOpenUser}>
+                                    <ListItemIcon>
+                                        <PersonIcon />
+                                    </ListItemIcon>
+                                    <ListItemText primary={`Users ${getUniquePosts().length}`} />
+                                    {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                                </ListItemButton>
                                 <Collapse in={expanded} timeout="auto" unmountOnExit>
                                     <List component="div" disablePadding>
                                         {getUniqueUsers().map((user, index) => (
@@ -135,7 +156,18 @@ export default function SearchBar() {
                                                 <ListItemText primary={`${user.first_name} ${user.last_name}`} />
                                             </ListItemButton>
                                         ))}
+                                        
                                     </List>
+                                </Collapse>
+                                <Collapse in={expanded} timeout="auto" unmountOnExit>
+                                {getUniquePosts().map((post, index) => (
+                                            <ListItemButton key={index} sx={{ pl: 4 }}>
+                                                <ListItemIcon>
+                                                    <PersonIcon />
+                                                </ListItemIcon>
+                                                <ListItemText primary={`${post.title}`} />
+                                            </ListItemButton>
+                                        ))}
                                 </Collapse>
                             </div>
                         )}

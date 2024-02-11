@@ -1,11 +1,11 @@
+
 import axios from "axios";
-
-
 
 
 const api = axios.create({
   baseURL: "/api", // Your API base URL
 });
+
 
 // Create a variable to track the refresh token request
 let isRefreshing = false;
@@ -61,12 +61,14 @@ api.interceptors.response.use(
 
         return axios(originalRequest);
       } catch (refreshError) {
+        
         // Handle refresh error (e.g., log out the user)
         console.error("Error refreshing token:", refreshError);
-
+          
         // Reject all queued requests with the refresh error
         refreshQueue.forEach((queueItem) => {
           queueItem.reject(refreshError);
+
         });
 
         refreshQueue = []; // Clear the queue

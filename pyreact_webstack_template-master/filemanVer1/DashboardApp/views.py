@@ -10,7 +10,7 @@ from rest_auth.registration.views import RegisterView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from .models import Posts, Comment, Tag, PostLikes
+from .models import Posts, Comment, Tag, PostLikes, PostSaves
 from django.db import models
 from rest_framework.parsers import MultiPartParser, FileUploadParser
 
@@ -72,6 +72,39 @@ class GenericPostAPIView(generics.GenericAPIView, mixins.ListModelMixin, mixins.
     def delete(self, request, id):
         return self.destroy(request, id)
     
+class GenericPostSaveAPIView(generics.GenericAPIView, mixins.ListModelMixin, mixins.CreateModelMixin, mixins.UpdateModelMixin, mixins.RetrieveModelMixin, mixins.DestroyModelMixin):
+    serializer_class = PostSaveSerializer
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [AllowAny]  # You can restrict access as needed
+
+    queryset = PostSaves.objects.all()
+    lookup_field = 'id'
+    def get(self,request, id=None):
+        if id:
+            return self.retrieve(request)
+        else:
+            return self.list(request)
+        
+    def post(self, request, id):
+        request.data['post'] = id
+        request.data['user'] = request.user.id
+        return self.create(request)
+    
+    def delete(self, request, id):
+        post_id = id
+
+        # Get the authenticated user
+        user = request.user
+
+        # Find and delete the like associated with the user and post_id
+        try:
+            postsave = PostSaves.objects.filter(user=user, post__id=post_id)
+
+            self.perform_destroy(postsave)
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except PostSaves.DoesNotExist:
+            return Response({"detail": "postsave not found"}, status=status.HTTP_404_NOT_FOUND)
+           
 
 class GenericPostLikeAPIView(generics.GenericAPIView, mixins.ListModelMixin, mixins.CreateModelMixin, mixins.UpdateModelMixin, mixins.RetrieveModelMixin, mixins.DestroyModelMixin):
     serializer_class = PostLikeSerializer
@@ -187,6 +220,31 @@ class TopLikedPostsView(ListAPIView):
     def get_queryset(self):
         return Posts.objects.annotate(like_count=models.Count('post_likes')).order_by('-like_count')[:10]
 
+class TagRetrieveView(ListAPIView):
+    serializer_class = TagSerializer
+    def get_queryset(self):
+       tag_name = self.kwargs.get('tag_name')  # Assuming 'tag_name' is the parameter in the URL
+       
+       # Filter posts based on the specified tag name
+       queryset = Tag.objects.filter(name=tag_name)
+       
+       # Annotate with the count of comments or other additional data if needed
+       
+       return queryset
+
+class PostsByTagView(ListAPIView):
+    serializer_class = PostSerializer
+
+    def get_queryset(self):
+        tag_name = self.kwargs.get('tag_name')  # Assuming 'tag_name' is the parameter in the URL
+        
+        # Filter posts based on the specified tag name
+        queryset = Posts.objects.filter(tags__name=tag_name)
+        
+        # Annotate with the count of comments or other additional data if needed
+        queryset = queryset.annotate(comment_count=Count('comments'))
+        
+        return queryset
 class TopLikedCommentsForPostView(ListAPIView):
     serializer_class = CommentSerializer
 
@@ -203,9 +261,7 @@ class TopLikedCommentsView(ListAPIView):
 class MostPopularTagsView(ListAPIView):
     queryset = Tag.objects.annotate(total_posts=models.Count('posts')).order_by('-total_posts')
     serializer_class = TagSerializer
-    filter_backends = [filters.SearchFilter]
-    search_fields = ['name']
-
+    
 class CommentCreateView(generics.CreateAPIView):
     serializer_class = CreateCommentSerializer
     authentication_classes = [JWTAuthentication]
@@ -238,7 +294,15 @@ class PostsByUserView(ListAPIView):
         user_id = self.kwargs['id']
         return Posts.objects.filter(user_id=user_id)
     
+class UserPostSavesView(generics.ListCreateAPIView):
+        serializer_class = PostSaveSerializer
+        authentication_classes = [JWTAuthentication]
+        permission_classes = [IsAuthenticated]
+        #lookup_field="user"
 
+        def get_queryset(self):
+        # Retrieve all posts saved by the current user
+            return PostSaves.objects.filter(user=self.request.user)
 class SearchView(APIView):
     def get(self,request):
         query = request.query_params.get('search','')
@@ -269,3 +333,6 @@ class SearchView(APIView):
         
 
         return Response(responseData)
+    
+
+    

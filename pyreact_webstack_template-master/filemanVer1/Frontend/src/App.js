@@ -24,7 +24,8 @@ function App() {
         <Route path="/login/" element={<SignIn/>}/>
         <Route path="/Profile/" element={<Profile/>}/>
         <Route path="/ee/" element={<TagDash/>}/>
-        <Route path="/ee/:ee/" element={<TagSlash/>}/>
+        <Route path="/ee/:eee/" element={<TagSlash/>}/>
+
       </Routes>
     </Router>
   );

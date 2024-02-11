@@ -16,6 +16,8 @@ class Posts(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     def user_has_liked(self, user):
         return self.post_likes.filter(user=user).exists()
+    def user_has_saved(self,user):
+        return self.post_saves.filter(user=user).exists
 
 class Comment(models.Model):    
     CommentText = models.TextField(max_length=1000)
@@ -28,10 +30,18 @@ class Comment(models.Model):
         return self.comment_likes.filter(user=user).exists()
 
 
+class TagSaves(models.Model):    
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    tag = models.ForeignKey(Tag, on_delete=models.CASCADE, related_name='tag_saves')
+
+
+class PostSaves(models.Model):    
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    post = models.ForeignKey(Posts, on_delete=models.CASCADE, related_name='post_saves')
+
 class CommentLikes(models.Model):
     comment = models.ForeignKey(Comment, on_delete=models.CASCADE, related_name='comment_likes')
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    
 
 class PostLikes(models.Model):
     post = models.ForeignKey(Posts, on_delete=models.CASCADE, related_name='post_likes')

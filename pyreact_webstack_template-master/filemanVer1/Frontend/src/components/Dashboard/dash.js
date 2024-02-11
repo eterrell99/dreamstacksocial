@@ -23,9 +23,12 @@ import MenuItem from '@mui/material/MenuItem';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import ReplyIcon from '@mui/icons-material/Reply';
 import DeleteIcon from '@mui/icons-material/Delete';
-
+import LocalOfferIcon from '@mui/icons-material/LocalOffer';
+import TagDash from '../Dashboard/Tags/tagDash'
+import MessageIcon from '@mui/icons-material/Message';
+import { useNavigate } from "react-router";
 export default function Dash() {
-
+    const navigate = useNavigate();
     const email = localStorage.getItem("email");
     const access = localStorage.getItem("access");
     const [topPosts, setTopPosts] = useState();
@@ -38,7 +41,7 @@ export default function Dash() {
     const [titleText, setTitleText] = useState();
     const [formData, setFormData]= useState({});
     const [selectedTags, setSelectedTags] = useState();
-
+    const [showTopTag, setShowTopTag] = useState(false);
 
     // 
     // Submit requset
@@ -118,6 +121,9 @@ export default function Dash() {
       setCreatePostExpanded(!createPostExpanded);
     };
 
+    const handleSelectTopTags = () => {
+      setShowTopTag(!showTopTag);
+    };
     useEffect(()=> {
     const fetchTopPosts = async () => {
       try {
@@ -143,7 +149,7 @@ export default function Dash() {
       fetchTopTags();  }, [])
     const { userData, loading, error } = getUser(email, access);
     if (loading) {
-        return <div>Loading...</div>;
+        console.log('loding')
       }
     
       if (error) {
@@ -157,19 +163,16 @@ export default function Dash() {
   
     return (
       <div>
-        <Navbar />
+        <Navbar expanded={expanded} setExpanded={setExpanded}/>
       <div style={{ display: "flex" }}>
         
         {/* Render the TagsList component */}
         
-        <TagsList tags={topTags} expanded={expanded}/>
+        <TagsList expanded={expanded} setExpanded={setExpanded}/>
         
-        <div style={{ flex: 1, paddingLeft: '25px',paddingRight:'25px',marginLeft: expanded ? "200px" : "0" }}>
-          
-          <button onClick={() => setExpanded(!expanded)}>
-        {expanded ? "Collapse Tags" : "Expand Tags"}
-      </button> <h2>Welcome {userData.first_name}</h2>
-      <Button onClick={handleExpandNewPost}>New Post</Button>
+        <div style={{ flex: 1, paddingLeft: '25px',paddingRight:'25px', marginLeft: "200px" }}>
+          <Button onClick={handleExpandNewPost} startIcon={<AddCircleOutlineIcon/>}>New Post</Button>
+          <Button onClick={handleSelectTopTags} startIcon={showTopTag? (<MessageIcon/>):(<LocalOfferIcon/>)}>{showTopTag? ("Top Posts"):("Top Tags")}</Button>
       <Collapse in={createPostExpanded} timeout="auto" unmountOnExit>
       <TextField
             fullWidth
@@ -258,12 +261,12 @@ export default function Dash() {
         </Grid>
         </div>
             </Collapse>
-          
-          {topPosts ? (
+          {showTopTag? (<TagDash/>): (<div>{topPosts ? (
             topPosts.map((post) => <Post key={post.id} post={post} thread={false}/>)
           ) : (
             <div></div>
-          )}
+          )}</div>)}
+          
         </div>
       </div>
       </div>

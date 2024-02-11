@@ -3,7 +3,7 @@ import useGetUser from "../Dashboard/getUser";
 import axios from "axios";
 import api from "../Services/token_refresh"
 import Navbar from "../Site/Navbar/Navbar";
-
+import TagsList from "../Dashboard/TagList";
 import {
   Container,
   Typography,
@@ -59,7 +59,7 @@ const { userData, loading, error } = useGetUser(email, access);
 const [editMode, setEditMode] = useState(false);
 const [editedData, setEditedData] = useState({ ...userData });
 // Initialize editedData with userData when the component is first rendered
-
+const [expanded, setExpanded] = useState(false);
 useEffect(()=> {
     setEditedData({...userData})
 }, [userData]);
@@ -131,7 +131,9 @@ if (error) {
   return <div>Error: {error.message}</div>;
 }
   return (
-    <div><Navbar/>
+    <div><Navbar expanded={expanded} setExpanded={setExpanded}/>
+    <TagsList  expanded={expanded}/>
+        
     <Container maxWidth="md"> 
       <Paper className={classes.paper} elevation={3}>
         <Grid container spacing={2} direction="row" justifyContent="flex-start"

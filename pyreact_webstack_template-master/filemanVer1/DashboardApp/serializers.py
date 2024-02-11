@@ -1,13 +1,28 @@
 from rest_framework_bulk import (BulkListSerializer,BulkSerializerMixin,)
-from .models import Posts, Comment, Tag, PostLikes, CommentLikes,File
+from .models import Posts, Comment, Tag, PostLikes, CommentLikes,File, PostSaves, TagSaves
 from rest_framework import serializers
 from UserApp.serializers import UserSerializer
+from django.db.models import Count
 import json
+
 class TagSerializer(serializers.ModelSerializer):
+    post_count = serializers.SerializerMethodField()
+    comment_count = serializers.SerializerMethodField()
+    #post_set = serializers.SerializerMethodField()
+
     class Meta:
         model = Tag
         fields = '__all__'
+    def get_comment_count(self, tag):
+        # Assuming you have a Comment model with a ForeignKey to Posts
+        post_ids_with_tag = tag.posts_set.values_list('id', flat=True)
+        return Comment.objects.filter(parent_post_id__in=post_ids_with_tag).count()
+    def get_post_count(self, tag):
+        return tag.posts_set.count()
+ 
 
+    
+    
 class FileSerializer(serializers.ModelSerializer,BulkSerializerMixin):
     class Meta:
         model = File
@@ -19,6 +34,7 @@ class PostSerializer(serializers.ModelSerializer):
     comment_count = serializers.SerializerMethodField()
     user = UserSerializer()
     user_has_liked = serializers.SerializerMethodField()
+    user_has_saved = serializers.SerializerMethodField()
     tags = TagSerializer(many=True)
     files = FileSerializer(many=True, read_only=True)
     
@@ -27,7 +43,11 @@ class PostSerializer(serializers.ModelSerializer):
         if request and request.user.is_authenticated:
             return obj.user_has_liked(request.user)
         return False
-    
+    def get_user_has_saved(self, obj):
+        request = self.context.get('request')
+        if request and request.user.is_authenticated:
+            return obj.user_has_liked(request.user)
+        return False    
     def get_like_count(self, obj):
         return obj.post_likes.count()
     
@@ -151,5 +171,16 @@ class PostLikeSerializer(serializers.ModelSerializer):
 class CommentLikeSerializer(serializers.ModelSerializer):
     class Meta:
         model = CommentLikes
+        fields = '__all__'        
+
+class PostSaveSerializer(serializers.ModelSerializer):
+    post = PostSerializer()
+    class Meta:
+        model = PostSaves
+        fields = '__all__'       
+
+class TagSaveSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TagSaves
         fields = '__all__'        
 

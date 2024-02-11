@@ -28,14 +28,19 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { Add } from "@mui/icons-material";
 import ListItemIcon from '@mui/material/ListItemIcon';
 import TestTag from "./testTag";
+import Inventory2Icon from '@mui/icons-material/Inventory2';
+import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArrowRight';
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import PostSaved from "./userPostSave";
+const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
 const formatDate = (timestamp) => {
+
   const date = new Date(timestamp);
   const day = date.getDate().toString().padStart(2, "0");
-  const month = (date.getMonth() + 1).toString().padStart(2, "0");
+  const month = monthNames[date.getMonth()];
   const year = date.getFullYear();
-  const hours = date.getHours().toString().padStart(2, "0");
-  const minutes = date.getMinutes().toString().padStart(2, "0");
-  return `${day}/${month}/${year} - ${hours}:${minutes}`;
+  return `${month} ${day}, ${year}`;
 };
 
 const Post = ({ post, thread }) => {
@@ -82,6 +87,7 @@ const Post = ({ post, thread }) => {
     user_has_liked,
     files
   } = post;
+  
   const [likeCountState, setLikeCountState] = useState(like_count);
   const [hasLiked, setHasLiked] =useState(user_has_liked);
   const [expanded, setExpanded] = useState(false);
@@ -90,7 +96,7 @@ const Post = ({ post, thread }) => {
   const [topComments, setTopComments] = useState();
   const [newComment, setNewComment] = useState();
   const [commentPostText, setCommentPostText] = useState();
-  
+  const [postSaved, setPostSaved] = useState(post.user_has_saved);
   const navigate = useNavigate();
   const handleSubmitPostComment = (e) => {
     e.preventDefault()
@@ -108,7 +114,12 @@ const Post = ({ post, thread }) => {
           }; 
 
       };
-      
+
+  const tagClick = (e,tag) =>{ 
+
+    e.preventDefault();
+    navigate(`/ee/${tag.name}/`)
+  }
 
   const handleLikeClick = () => {
     if (hasLiked===false){const addLike = async () => {
@@ -200,11 +211,13 @@ const Post = ({ post, thread }) => {
       setAnchorEl(null);
     };
 
+    
+
   return (
     <div className={classes.cardContainer}>
     <Card className={classes.card} variant="outlined">
       <CardContent className={classes.content}>
-        <Grid container spacing={2} direction="row" justifyContent="flex-start" alignItems="center" >
+        <Grid container spacing={2} direction="row" justifyContent="space-between" alignItems="center" >
           <Grid item>
             <Avatar className={classes.avatar} src={user.profile_pic}>{user.profile_pic ? "":  user.first_name.charAt(0)}</Avatar>
             </Grid>
@@ -213,8 +226,9 @@ const Post = ({ post, thread }) => {
                {user.first_name} {user.last_name} on {formatDate(created)}
           </Typography>
           </Grid>
+          <PostSaved id={id} saved={postSaved}/>
           <Grid item>
-              {thread ? (<div></div>): (<Button onClick={() => navigate(`/post/${id}/`)}>See Thread</Button>)}
+              {thread ? (<div></div>): (<Button variant={"contained"} onClick={() => navigate(`/post/${id}/`)} endIcon={<KeyboardDoubleArrowRightIcon/>}>See Thread</Button>)}
           </Grid>
           
         </Grid>  
@@ -223,12 +237,13 @@ const Post = ({ post, thread }) => {
         
         {files.length > 0 ? (<ImageViewer files={files} />) : <div></div> }
         <Typography variant="body1">{text}</Typography>
-
+        {/* If more than 2-3 tags, store tags in a dropdown. ex: [sports] +3 more */}
         {tags.length > 0 && (
           <div className={classes.tags}>
             <Typography variant="subtitle2">Tags:</Typography>
             {tags.map((tag) => (
               <Button
+                onClick={(e)=>tagClick(e,tag)}
                 key={tag.id}
                 variant="outlined"
                 size="small"
