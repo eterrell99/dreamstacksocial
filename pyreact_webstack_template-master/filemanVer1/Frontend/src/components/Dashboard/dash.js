@@ -42,7 +42,7 @@ export default function Dash() {
     const [formData, setFormData]= useState({});
     const [selectedTags, setSelectedTags] = useState();
     const [showTopTag, setShowTopTag] = useState(false);
-
+    const [tagParent, setTagParent] = useState();
     // 
     // Submit requset
     //
@@ -168,7 +168,7 @@ export default function Dash() {
         
         {/* Render the TagsList component */}
         
-        <TagsList expanded={expanded} setExpanded={setExpanded}/>
+        <TagsList expanded={expanded} setExpanded={setExpanded} tag={tagParent} setTags={setTagParent}/>
         
         <div style={{ flex: 1, paddingLeft: '25px',paddingRight:'25px', marginLeft: "200px" }}>
           <Button onClick={handleExpandNewPost} startIcon={<AddCircleOutlineIcon/>}>New Post</Button>
@@ -262,7 +262,7 @@ export default function Dash() {
         </div>
             </Collapse>
           {showTopTag? (<TagDash/>): (<div>{topPosts ? (
-            topPosts.map((post) => <Post key={post.id} post={post} thread={false}/>)
+            topPosts.map((post) => <Post key={post.id} post={post} thread={false} tags={tagParent} setListTags={setTagParent}/>)
           ) : (
             <div></div>
           )}</div>)}

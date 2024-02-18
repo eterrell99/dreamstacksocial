@@ -27,7 +27,6 @@ import ReplyIcon from '@mui/icons-material/Reply';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Add } from "@mui/icons-material";
 import ListItemIcon from '@mui/material/ListItemIcon';
-import TestTag from "./testTag";
 import Inventory2Icon from '@mui/icons-material/Inventory2';
 import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArrowRight';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
@@ -43,7 +42,7 @@ const formatDate = (timestamp) => {
   return `${month} ${day}, ${year}`;
 };
 
-const Post = ({ post, thread }) => {
+const Post = ({ post, thread,listTags ,setListTags }) => {
 
   const useStyles = makeStyles((theme) => ({
     cardContainer: {
@@ -226,15 +225,14 @@ const Post = ({ post, thread }) => {
                {user.first_name} {user.last_name} on {formatDate(created)}
           </Typography>
           </Grid>
-          <PostSaved id={id} saved={postSaved}/>
+          <PostSaved id={id} saved={postSaved} setTags={setListTags}/>
           <Grid item>
               {thread ? (<div></div>): (<Button variant={"contained"} onClick={() => navigate(`/post/${id}/`)} endIcon={<KeyboardDoubleArrowRightIcon/>}>See Thread</Button>)}
           </Grid>
           
         </Grid>  
         <Typography variant="h6">{title}</Typography>
-        <TestTag postID={1}/>
-        
+      
         {files.length > 0 ? (<ImageViewer files={files} />) : <div></div> }
         <Typography variant="body1">{text}</Typography>
         {/* If more than 2-3 tags, store tags in a dropdown. ex: [sports] +3 more */}

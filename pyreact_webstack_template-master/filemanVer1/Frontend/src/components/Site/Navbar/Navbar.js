@@ -134,7 +134,7 @@ export default function Navbar( {expanded, setExpanded}) {
             <>
               <Grid item>
               <Button onClick={() => setExpanded(!expanded)}>
-                <Inventory2Icon />
+                <Inventory2Icon sx={{color: "white"}}/>
               </Button> 
               </Grid>
               <Grid item>

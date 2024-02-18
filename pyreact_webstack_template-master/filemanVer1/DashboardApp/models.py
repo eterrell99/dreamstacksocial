@@ -12,12 +12,13 @@ class Posts(models.Model):
     title = models.CharField(max_length=100)
     text = models.TextField(max_length=1000)
     created = models.DateTimeField(auto_now_add=True)
-    tags = models.ManyToManyField(Tag, null=True, blank=True)
+    tags = models.ManyToManyField(Tag, blank=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     def user_has_liked(self, user):
         return self.post_likes.filter(user=user).exists()
-    def user_has_saved(self,user):
-        return self.post_saves.filter(user=user).exists
+    
+    def user_has_saved(self, user):
+        return self.post_saves.filter(user=user).exists()
 
 class Comment(models.Model):    
     CommentText = models.TextField(max_length=1000)
@@ -36,8 +37,9 @@ class TagSaves(models.Model):
 
 
 class PostSaves(models.Model):    
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
     post = models.ForeignKey(Posts, on_delete=models.CASCADE, related_name='post_saves')
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    
 
 class CommentLikes(models.Model):
     comment = models.ForeignKey(Comment, on_delete=models.CASCADE, related_name='comment_likes')

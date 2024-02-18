@@ -27,10 +27,10 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const TagsList = ({ expanded }) => {
+const TagsList = ({ expanded, tags, setTags }) => {
   const classes = useStyles();
   const navigate = useNavigate();
-  const [tags, setTags] = useState();
+  const [svTags, setSvTags] = useState();
 
   const handleTagClick = (e,tag) => {
     e.preventDefault();
@@ -42,13 +42,13 @@ const TagsList = ({ expanded }) => {
       try {
         const response = await api.get(`posts/usrsv/`, {headers: { Authorization: `Bearer ${localStorage.getItem('access')}` },
       });
-        setTags(response.data);
+        setSvTags(response.data);
       } catch (error) {
         console.error("Error fetching posts:", error);
         throw error; // Rethrow the error for handling in the component
       }
     };
-    fetchTopTags();  }, [])
+    fetchTopTags();  }, [tags])
   return (
     <Paper
       className={`${classes.root} ${expanded ? "" : classes.collapsed}`}
@@ -56,7 +56,7 @@ const TagsList = ({ expanded }) => {
     >
       <List>
         {/* Render your tags here */}
-        {tags?(tags.map((tag) => (
+        {svTags?(svTags.map((tag) => (
           <ListItem button key={tag.id}>
             <ListItemAvatar>
               <Avatar className={classes.avatar} src={tag.post.user.profile_pic ? (tag.post.user.profile_pic):("")}>{tag.post.user.profile_pic ? "":  tag.post.user.first_name.charAt(0)}</Avatar>

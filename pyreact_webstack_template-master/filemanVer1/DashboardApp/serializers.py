@@ -28,6 +28,10 @@ class FileSerializer(serializers.ModelSerializer,BulkSerializerMixin):
         model = File
         list_serializer_class = BulkListSerializer
         fields = "__all__"   
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['type'] = instance.file.url.split('.')[-1]  # Extracting the file type from the URL
+        return representation
 
 class PostSerializer(serializers.ModelSerializer):
     like_count = serializers.SerializerMethodField()
@@ -46,7 +50,7 @@ class PostSerializer(serializers.ModelSerializer):
     def get_user_has_saved(self, obj):
         request = self.context.get('request')
         if request and request.user.is_authenticated:
-            return obj.user_has_liked(request.user)
+            return obj.user_has_saved(request.user)
         return False    
     def get_like_count(self, obj):
         return obj.post_likes.count()
@@ -174,11 +178,14 @@ class CommentLikeSerializer(serializers.ModelSerializer):
         fields = '__all__'        
 
 class PostSaveSerializer(serializers.ModelSerializer):
-    post = PostSerializer()
     class Meta:
         model = PostSaves
         fields = '__all__'       
-
+class GetPostSaveSerializer(serializers.ModelSerializer):
+    post = PostSerializer()
+    class Meta: 
+        model = PostSaves
+        fields = '__all__'
 class TagSaveSerializer(serializers.ModelSerializer):
     class Meta:
         model = TagSaves

@@ -3,7 +3,16 @@ import { Button, Backdrop, IconButton, Container, Grid } from '@mui/material';
 import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import CloseIcon from '@mui/icons-material/Close';
-
+import ReactPlayer from 'react-player';
+import './mediaViewer.css';
+const mediaContainerStyle = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  maxHeight: '100%',
+  maxWidth: '100%',
+  overflow: 'hidden',
+};
 function ImageViewer({ files }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [open, setOpen] = useState(false);
@@ -32,15 +41,46 @@ function ImageViewer({ files }) {
     e.stopPropagation();
   };
 
+  const currentFile = files[currentIndex];
+
+  const supportedImageExtensions = ['jpg', 'jpeg', 'png', 'gif'];
+  const supportedVideoExtensions = ['mp4', 'webm', 'ogg'];
+
+  const getFileExtension = (url) => {
+    return url.split('.').pop().toLowerCase();
+  };
+
+  const isImageFile = (url) => {
+    const extension = getFileExtension(url);
+    return supportedImageExtensions.includes(extension);
+  };
+
+  const isVideoFile = (url) => {
+    const extension = getFileExtension(url);
+    return supportedVideoExtensions.includes(extension);
+  };
+
+  const renderMediaContent = () => {
+    if (currentFile && currentFile.file) {
+      const url = currentFile.file.toLowerCase();
+      if (isImageFile(url)) {
+        return (
+          <img src={url} alt={`Image ${currentIndex}`} style={{ ...mediaContainerStyle, objectFit: 'cover', cursor: 'pointer' }} onClick={openImage} />
+        );
+      } else if (isVideoFile(url)) {
+        return (
+          <ReactPlayer url={url} controls={true} className='react-player' width='100%' height='100%'/>
+        );
+      }
+    }
+    return null;
+  };
+  const mediaContent = renderMediaContent();
+
   return (
     <div className="image-viewer">
       <div className="image-container" style={{ maxHeight: '300px', position: 'relative', overflow: 'hidden' }}>
-        <img
-          src={files[currentIndex].file}
-          alt={`Image ${currentIndex}`}
-          style={{ maxHeight: '100%', maxWidth: '100%', cursor: 'pointer' }}
-          onClick={openImage}
-        />
+        {mediaContent}
         <div className="navigation-buttons">
           <Button
             onClick={(e) => {
@@ -83,8 +123,8 @@ function ImageViewer({ files }) {
               </IconButton>
             </Grid>
             <Grid item xs={10}>
-              <div className="fullscreen-image-container">
-                <img src={files[currentIndex].file} alt={`Image ${currentIndex}`} style={{ maxWidth: '100%', maxHeight: '100%' }}/>
+              <div className='player-wrapper'>
+                {mediaContent}
               </div>
             </Grid>
             <Grid item xs={1}>

@@ -15,14 +15,14 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ListItemButton from '@mui/material/ListItemButton';
 import { Person } from '@mui/icons-material';
-
-
-
+import MessageIcon from '@mui/icons-material/Message';
+import {Avatar} from "@material-ui/core";
+import { AccountCircle } from "@mui/icons-material";
 export default function SearchBar() {
     const [search, setSearch] = useState('');
     const [searchResults, setSearchResults] = useState([]);
     const [expanded, setExpanded] = useState(false);
-
+    const [postsExpanded, setPostsExpanded] = useState(false);
     const handleSearchQuery = async (e) => {
         e.preventDefault();
         setSearch(e.target.value);
@@ -44,6 +44,11 @@ export default function SearchBar() {
     const handleOpenUser = () => {
         setExpanded(!expanded);
     };
+    const handleOpenPost = () => {
+        setPostsExpanded(!postsExpanded);
+    };
+
+
     const getUniqueUsers = () => {
         const uniqueUsers = new Map();
     
@@ -122,7 +127,7 @@ export default function SearchBar() {
                         width: '100%',
                         backgroundColor: 'white',
                         color: 'black',
-                        maxHeight: '150px',
+                        maxHeight: '300px',
                         overflowY: 'auto',
                         border: '1px solid #000000',
                     }}
@@ -136,14 +141,7 @@ export default function SearchBar() {
                                     <ListItemIcon>
                                         <PersonIcon />
                                     </ListItemIcon>
-                                    <ListItemText primary={`Users ${getUniqueUsers().length}`} />
-                                    {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-                                </ListItemButton>
-                                <ListItemButton onClick={handleOpenUser}>
-                                    <ListItemIcon>
-                                        <PersonIcon />
-                                    </ListItemIcon>
-                                    <ListItemText primary={`Users ${getUniquePosts().length}`} />
+                                    <ListItemText primary={`Users - ${getUniqueUsers().length}`} />
                                     {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
                                 </ListItemButton>
                                 <Collapse in={expanded} timeout="auto" unmountOnExit>
@@ -151,7 +149,8 @@ export default function SearchBar() {
                                         {getUniqueUsers().map((user, index) => (
                                             <ListItemButton key={index} sx={{ pl: 4 }}>
                                                 <ListItemIcon>
-                                                    <PersonIcon />
+                                                {user.profile_pic ? (<Avatar src={user.profile_pic}>{user.profile_pic ? "":  userData.first_name.charAt(0)}</Avatar>
+                                                ):(<AccountCircle   fontSize="large"/>)}
                                                 </ListItemIcon>
                                                 <ListItemText primary={`${user.first_name} ${user.last_name}`} />
                                             </ListItemButton>
@@ -159,11 +158,21 @@ export default function SearchBar() {
                                         
                                     </List>
                                 </Collapse>
-                                <Collapse in={expanded} timeout="auto" unmountOnExit>
+                                <ListItemButton onClick={handleOpenPost}>
+                                    <ListItemIcon>
+                                        <MessageIcon />
+                                    </ListItemIcon>
+                                    <ListItemText primary={`Posts - ${getUniquePosts().length}`} />
+                                    {postsExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                                </ListItemButton>
+                                
+                                <Collapse in={postsExpanded} timeout="auto" unmountOnExit>
                                 {getUniquePosts().map((post, index) => (
                                             <ListItemButton key={index} sx={{ pl: 4 }}>
                                                 <ListItemIcon>
-                                                    <PersonIcon />
+                                                {post.user.profile_pic ? (<Avatar src={post.user.profile_pic}>{post.user.profile_pic ? "":  post.user.first_name.charAt(0)}</Avatar>
+                                                ):(<MessageIcon  fontSize="large" />)}
+                    
                                                 </ListItemIcon>
                                                 <ListItemText primary={`${post.title}`} />
                                             </ListItemButton>

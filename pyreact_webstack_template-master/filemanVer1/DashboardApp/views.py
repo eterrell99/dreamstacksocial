@@ -75,8 +75,7 @@ class GenericPostAPIView(generics.GenericAPIView, mixins.ListModelMixin, mixins.
 class GenericPostSaveAPIView(generics.GenericAPIView, mixins.ListModelMixin, mixins.CreateModelMixin, mixins.UpdateModelMixin, mixins.RetrieveModelMixin, mixins.DestroyModelMixin):
     serializer_class = PostSaveSerializer
     authentication_classes = [JWTAuthentication]
-    permission_classes = [AllowAny]  # You can restrict access as needed
-
+    permission_classes = [IsAuthenticated]  # You can restrict access as needed
     queryset = PostSaves.objects.all()
     lookup_field = 'id'
     def get(self,request, id=None):
@@ -84,12 +83,13 @@ class GenericPostSaveAPIView(generics.GenericAPIView, mixins.ListModelMixin, mix
             return self.retrieve(request)
         else:
             return self.list(request)
-        
     def post(self, request, id):
         request.data['post'] = id
         request.data['user'] = request.user.id
+
         return self.create(request)
     
+
     def delete(self, request, id):
         post_id = id
 
@@ -295,7 +295,7 @@ class PostsByUserView(ListAPIView):
         return Posts.objects.filter(user_id=user_id)
     
 class UserPostSavesView(generics.ListCreateAPIView):
-        serializer_class = PostSaveSerializer
+        serializer_class = GetPostSaveSerializer
         authentication_classes = [JWTAuthentication]
         permission_classes = [IsAuthenticated]
         #lookup_field="user"

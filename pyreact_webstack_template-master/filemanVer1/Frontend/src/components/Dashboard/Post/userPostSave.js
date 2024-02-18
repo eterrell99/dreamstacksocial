@@ -6,7 +6,7 @@ import api from "../../Services/token_refresh";
 import Grid from "@material-ui/core/Grid";
 import Inventory2Icon from '@mui/icons-material/Inventory2';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
-const PostSaved = ({id, saved}) => {
+const PostSaved = ({id, saved,setTags}) => {
     const [isSaved,setIsSaved]= useState(saved);
 
     const handlePostSaveClick = (e) =>{ 
@@ -14,8 +14,9 @@ const PostSaved = ({id, saved}) => {
         if (isSaved===false){
           const addSave = async () => {
           try {
-            const response = await api.post(`posts/${id}/sv/`, {post:{id:id}},{headers:{Authorization:`Bearer ${localStorage.getItem('access')}`}});
+            const response = await api.post(`posts/${id}/sv/`, {post: id},{headers:{Authorization:`Bearer ${localStorage.getItem('access')}`}});
             setIsSaved(true);
+            setTags();
 
           } catch (error) {
             console.error("Error fetching posts:", error);
@@ -27,6 +28,7 @@ const PostSaved = ({id, saved}) => {
           try {
             const response = await api.delete(`posts/${id}/sv/`,{headers:{Authorization:`Bearer ${localStorage.getItem('access')}`}});
             setIsSaved(false);
+            setTags();
             
           } catch (error) {
             console.error("Error fetching posts:", error);
