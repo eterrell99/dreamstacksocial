@@ -12,13 +12,15 @@ import ExpandedPost from './components/Dashboard/Post/postExpanded';
 import { Provider } from 'react-redux';
 import TagSlash from './components/Dashboard/Tags/tagSlash';
 import TagDash from './components/Dashboard/Tags/tagDash';
+import Homepage from './components/Site/Navbar/Home/home';
 
 function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Dash/>}/>
-        <Route path="" element={<Dash/>}/>
+        <Route path="/" element={<Homepage/>}/>
+        <Route path="" element={<Homepage/>}/>
+        <Route path="/dash/" element={<Dash/>}/>
         <Route path="/post/:post/" element={<ExpandedPost/>}/>
         <Route path="/signup/" element={<Register/>}/>
         <Route path="/login/" element={<SignIn/>}/>

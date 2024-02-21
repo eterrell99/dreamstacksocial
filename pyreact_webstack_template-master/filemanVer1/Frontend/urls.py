@@ -8,6 +8,8 @@ urlpatterns = [
     path('profile/', index),
     path('post/<int:id>/',index ),
     path('ee/',index),
-    path('ee/<str:eeID>/', index)
+    path('ee/<str:eeID>/', index),
+    path('dash/',index)
+
 
 ]

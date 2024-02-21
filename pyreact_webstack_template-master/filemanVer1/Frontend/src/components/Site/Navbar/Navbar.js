@@ -107,7 +107,7 @@ export default function Navbar( {expanded, setExpanded}) {
     localStorage.removeItem("refreshToken");
     localStorage.removeItem("email");
     setLoggedIn(false);
-    // Redirect or show a confirmation message
+    navigate('/');
   };
 
   const handleLogin = () => {

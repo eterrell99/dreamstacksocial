@@ -57,7 +57,7 @@ export default function SignIn() {
       localStorage.setItem("access", response.data.access)
       localStorage.setItem("refresh", response.data.refresh)
       localStorage.setItem('email', formData.email)
-      navigate('/');
+      navigate('/dash/');
       // You can redirect the user or perform other actions upon successful sign-in
     } catch (error) {
       console.error("Sign-in failed:", error);
