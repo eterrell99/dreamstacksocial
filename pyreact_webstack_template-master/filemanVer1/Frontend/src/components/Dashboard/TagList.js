@@ -13,7 +13,7 @@ import api from '../Services/token_refresh'
 const useStyles = makeStyles((theme) => ({
   root: {
     position: "fixed",
-    top: 0,
+    top: 55,
     left: 0,
     width: "200px", // Width when expanded
     height: "100%", // Make it cover the entire height
@@ -21,6 +21,7 @@ const useStyles = makeStyles((theme) => ({
     overflowY: "auto",
     boxShadow: "2px 0 5px rgba(0, 0, 0, 0.1)", // Add shadow to separate from content
     transition: "left 0.3s ease", // Smooth transition for left property
+    zIndex:1,
   },
   collapsed: {
     left: "-200px", // Move it to the left when collapsed

@@ -46,18 +46,19 @@ const Post = ({ post, thread,listTags ,setListTags }) => {
 
   const useStyles = makeStyles((theme) => ({
     cardContainer: {
-      display: thread ? "flex" : '',
-      justifyContent: thread ? "center" :'', // Center horizontally
+      display: "flex",
+      justifyContent: "center", // Center horizontally
       paddingBottom: '7px',
       
     },
     card: {
-      maxWidth: thread ? "78vw" : "60vw", // Adjust the maxWidth
-      padding: thread ? "0 75px" : "0", // Apply padding only if it's a thread
-      width: thread ? "78vw" : "auto",
+      maxWidth: thread ? "78vw" : "78vw", // Adjust the maxWidth
+      padding: "16px", // Apply padding only if it's a thread
+      width: thread ? "80%" : "auto",
     
     },
     content: {
+      
       paddingBottom: "8px",
     },
     actions: {

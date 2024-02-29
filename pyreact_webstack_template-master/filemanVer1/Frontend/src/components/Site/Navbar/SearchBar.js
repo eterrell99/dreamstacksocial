@@ -14,15 +14,23 @@ import PersonIcon from '@mui/icons-material/Person';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ListItemButton from '@mui/material/ListItemButton';
-import { Person } from '@mui/icons-material';
+import { Height, Person } from '@mui/icons-material';
 import MessageIcon from '@mui/icons-material/Message';
-import {Avatar} from "@material-ui/core";
+import {Avatar, Box, Grid} from "@material-ui/core";
 import { AccountCircle } from "@mui/icons-material";
+import Button from '@mui/material/Button';
+import { styled } from '@mui/material/styles';
+import { purple,white } from '@mui/material/colors';
+import useMediaQuery from '@mui/material/useMediaQuery';
+
 export default function SearchBar() {
+    const [searchButton, setSearchButton] = useState(false);
     const [search, setSearch] = useState('');
     const [searchResults, setSearchResults] = useState([]);
     const [expanded, setExpanded] = useState(false);
     const [postsExpanded, setPostsExpanded] = useState(false);
+    const matches = useMediaQuery('(min-width:600px)');
+
     const handleSearchQuery = async (e) => {
         e.preventDefault();
         setSearch(e.target.value);
@@ -92,29 +100,49 @@ export default function SearchBar() {
         return Array.from(uniquePosts.values());
     };
 
+    const handleChangeSearchButton = (button) => {
+        setSearchButton(!button);
+    };
 
+    const ColorButton = styled(Button)(({ theme }) => ({
+        border:'none',
+        minHeight:'42px',
+        color: "#3c3c3c",
+        backgroundColor: "#fafafa",
+        '&:hover': {
+          backgroundColor: "#dedede",
+        },
+      }));
 
     return (
         <div>
-            <List
-                direction="column"
-                sx={{
-                    width: '400px',
-                    position: 'relative',
-                    backgroundColor: 'white',
-                }}
-            >
-                <ListItem alignItems="flex-start">
+           <div style={{ display: 'flex', alignItems: 'center', width: !matches? '210px': '300px'}}>
+
+           
+           <ColorButton variant="contained"  onClick={()=>handleChangeSearchButton(searchButton)}>
+                    <SearchIcon />
+            </ColorButton >
+            <Collapse in={searchButton} orientation="horizontal"> 
+
+                <Paper
+                        component="form"
+                        sx={{display: 'flex', alignItems: 'center', width:'100%' }}
+                    >
+                <List  direction="column"
+                                    sx={{
+                                        width: '100%',
+                                        position: 'relative',
+                                        backgroundColor: 'white',
+                                        border: '1px solid #979797' 
+                                    }}> 
+               
                     <InputBase
-                        sx={{ ml: 1, flex: 1, maxHeight: '25px', minWidth: '300px',maxWidth:'600px', }}
+                        sx={{ ml: 1, flex: 1, maxHeight: '25px', width:'100%'}}
                         placeholder="Search"
                         inputProps={{ 'aria-label': 'search' }}
                         onChange={(e) => handleSearchQuery(e)}
                     />
-                    <ListItemIcon>
-                        <SearchIcon />
-                    </ListItemIcon>
-                </ListItem>
+            
                 <Collapse
                     in={search.length !== 0}
                     timeout="auto"
@@ -129,14 +157,17 @@ export default function SearchBar() {
                         color: 'black',
                         maxHeight: '300px',
                         overflowY: 'auto',
-                        border: '1px solid #000000',
+                        border: '1px solid #818181',
+                        
                     }}
                 >
+                    
                      <div>
                         {searchResults.length === 0 ? (
                             <></>
                         ) : (
                             <div>
+                                
                                 <ListItemButton onClick={handleOpenUser}>
                                     <ListItemIcon>
                                         <PersonIcon />
@@ -177,12 +208,19 @@ export default function SearchBar() {
                                                 <ListItemText primary={`${post.title}`} />
                                             </ListItemButton>
                                         ))}
-                                </Collapse>
-                            </div>
-                        )}
+                                        
+                    </Collapse>
+                    
                     </div>
-                </Collapse>
+                    )}
+                        
+                </div>
+                
+            </Collapse>
             </List>
+            </Paper>
+            </Collapse>                     
         </div>
+    </div>
     );
 }

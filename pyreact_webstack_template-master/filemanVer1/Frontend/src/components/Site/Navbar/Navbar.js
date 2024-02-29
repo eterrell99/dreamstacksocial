@@ -18,6 +18,8 @@ import SearchBar from "./SearchBar";
 import Grid from "@material-ui/core/Grid";
 import getUser from "../../Dashboard/getUser";
 import Inventory2Icon from '@mui/icons-material/Inventory2';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import HomeIcon from '@mui/icons-material/Home';
 const useStyles = makeStyles((theme) => ({
     title: {
       flexGrow: 1,
@@ -39,7 +41,8 @@ const useStyles = makeStyles((theme) => ({
     },
   }));
 
-export default function Navbar( {expanded, setExpanded}) {
+export default function Navbar( {expanded, setExpanded,setCreatePostExpanded}) {
+  const mobile = useMediaQuery('(min-width:700px)');
   const email = localStorage.getItem("email");
   const access = localStorage.getItem("access");
   const [loggedIn, setLoggedIn] = useState(false);
@@ -103,6 +106,7 @@ export default function Navbar( {expanded, setExpanded}) {
       };
   
       loggoutUser();
+      
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
     localStorage.removeItem("email");
@@ -114,11 +118,100 @@ export default function Navbar( {expanded, setExpanded}) {
     navigate('/login/');
   }
   const handleSignUp = () => {
-    navigate('/signup/')
+    navigate('/signup/');
   }
-
+  const handleExpandClick = () =>{
+    if (!expanded) {setCreatePostExpanded(false);}
+    setExpanded(!expanded);
+    
+  }
+  const handleHomeClick = () => {
+    navigate('/dash/');
+  }
   return (
-    <div style={{marginLeft: expanded ? "200px":"0"}}>
+    <div>
+      
+{ !mobile ? 
+    (
+    // Mobile
+    <div>
+      
+      <AppBar position="static">
+      <Toolbar >
+      <Grid container direction="row"
+justifyContent="space-between"
+alignItems="center"> 
+      {loggedIn ? (
+        <>
+          <Grid item lg={1}>
+          <Button onClick={() => handleHomeClick()}>
+            <HomeIcon sx={{color: "white"}}/>
+          </Button> 
+          </Grid>
+          <Grid item lg={1}>
+          <Button onClick={() => handleExpandClick()}>
+            <Inventory2Icon sx={{color: "white"}}/>
+          </Button> 
+          </Grid>
+          <Grid item xs={6} md={3}>
+            <SearchBar/>
+          </Grid>
+          
+          <Grid item lg={2}> 
+
+          <Button
+            color="inherit"
+            onClick={handleMenuOpen}
+            edge="end"
+            aria-label="account of current user"
+            aria-haspopup="true"
+            endIcon={userData ? (<Avatar src={userData.profile_pic}>{userData.profile_pic ? "":  userData.first_name.charAt(0)}</Avatar>
+            ):(<AccountCircle  />)}
+            
+          >
+        
+        
+        
+          </Button>
+          
+          <Menu
+            anchorEl={anchorEl}
+            open={Boolean(anchorEl)}
+            onClose={handleMenuClose}
+            className={classes.menu}
+          >
+            <MenuItem
+              onClick={((e)=> handleNavigateProfile(e))}
+              className={classes.menuItem}
+            >
+              <AccountCircle className={classes.menuIcon} />
+               Profile
+            </MenuItem>
+            <MenuItem
+              onClick={handleLogout}
+              className={classes.menuItem}
+            >
+              <LogoutIcon className={classes.menuIcon} />
+              Logout
+            </MenuItem>
+            {/* Add other menu items for user profile, settings, etc. */}
+          </Menu>
+          </Grid>
+        </>
+      ) : (
+        <>
+        
+          <Button color="inherit">Login</Button>
+          <Button color="inherit">Sign Up</Button>
+        </>
+      )}
+      
+      </Grid>
+    </Toolbar>
+  </AppBar></div>
+  // Desktop
+  ) : (
+    <div>
       <AppBar position="static">
         <Toolbar >
           <Grid container direction="row"
@@ -137,8 +230,8 @@ export default function Navbar( {expanded, setExpanded}) {
                 <Inventory2Icon sx={{color: "white"}}/>
               </Button> 
               </Grid>
-              <Grid item>
-                <SearchBar/>
+              <Grid item xs={2} md={3}>
+                <SearchBar ex={expanded}/>
               </Grid>
               
               <Grid item>
@@ -204,6 +297,7 @@ export default function Navbar( {expanded, setExpanded}) {
           </Grid>
         </Toolbar>
       </AppBar>
+    </div>)}
     </div>
   );
 }

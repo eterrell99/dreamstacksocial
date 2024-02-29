@@ -27,6 +27,8 @@ import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 import TagDash from '../Dashboard/Tags/tagDash'
 import MessageIcon from '@mui/icons-material/Message';
 import { useNavigate } from "react-router";
+import useMediaQuery from '@mui/material/useMediaQuery';
+
 export default function Dash() {
     const navigate = useNavigate();
     const email = localStorage.getItem("email");
@@ -43,7 +45,7 @@ export default function Dash() {
     const [selectedTags, setSelectedTags] = useState();
     const [showTopTag, setShowTopTag] = useState(false);
     const [tagParent, setTagParent] = useState();
-    // 
+    const matches = useMediaQuery('(min-width:600px)'); 
     // Submit requset
     //
      
@@ -163,14 +165,14 @@ export default function Dash() {
   
     return (
       <div>
-        <Navbar expanded={expanded} setExpanded={setExpanded}/>
+        <Navbar expanded={expanded} setExpanded={setExpanded} setCreatePostExpanded={setCreatePostExpanded}/>
       <div style={{ display: "flex" }}>
         
         {/* Render the TagsList component */}
         
         <TagsList expanded={expanded} setExpanded={setExpanded} tag={tagParent} setTags={setTagParent}/>
         
-        <div style={{ flex: 1, paddingLeft: '25px',paddingRight:'25px', marginLeft: "200px" }}>
+        <div style={{ flex: 1, paddingLeft: '25px',paddingRight:'25px', }}>
           <Button onClick={handleExpandNewPost} startIcon={<AddCircleOutlineIcon/>}>New Post</Button>
           <Button onClick={handleSelectTopTags} startIcon={showTopTag? (<MessageIcon/>):(<LocalOfferIcon/>)}>{showTopTag? ("Top Posts"):("Top Tags")}</Button>
       <Collapse in={createPostExpanded} timeout="auto" unmountOnExit>
