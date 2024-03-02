@@ -15,7 +15,6 @@ import CreateIcon from '@mui/icons-material/Create';
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 
 const Comment = ({ comment,onDeleteComment,postID,setNewComment }) => {
-  console.log(comment.replies);
   const [likeCountState, setLikeCountState] = useState(comment.like_count);
   const [hasLiked, setHasLiked] = useState(comment.user_has_liked);
   const [expanded, setExpanded] = useState(false);

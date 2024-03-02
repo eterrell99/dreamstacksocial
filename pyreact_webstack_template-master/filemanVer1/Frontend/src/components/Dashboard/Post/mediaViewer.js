@@ -12,6 +12,7 @@ const mediaContainerStyle = {
   maxHeight: '100%',
   maxWidth: '100%',
   overflow: 'hidden',
+  zIndex:'1',
 };
 function ImageViewer({ files }) {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -64,6 +65,7 @@ function ImageViewer({ files }) {
     if (currentFile && currentFile.file) {
       const url = currentFile.file.toLowerCase();
       if (isImageFile(url)) {
+        console.log(url);
         return (
           <img src={url} alt={`Image ${currentIndex}`} style={{ ...mediaContainerStyle, objectFit: 'cover', cursor: 'pointer' }} onClick={openImage} />
         );

@@ -172,88 +172,92 @@ export default function Dash() {
         
         <TagsList expanded={expanded} setExpanded={setExpanded} tag={tagParent} setTags={setTagParent}/>
         
-        <div style={{ flex: 1, paddingLeft: '25px',paddingRight:'25px', }}>
-          <Button onClick={handleExpandNewPost} startIcon={<AddCircleOutlineIcon/>}>New Post</Button>
-          <Button onClick={handleSelectTopTags} startIcon={showTopTag? (<MessageIcon/>):(<LocalOfferIcon/>)}>{showTopTag? ("Top Posts"):("Top Tags")}</Button>
-      <Collapse in={createPostExpanded} timeout="auto" unmountOnExit>
-      <TextField
-            fullWidth
-          id="outlined-multiline-static"
-          label="Title"
-          multiline
-          rows={1}
-          defaultValue=""
-          onChange={(e)=>setTitleText(e.target.value)}
-          sx={{padding:'10px'}}
-        />
+        <div style={{ flex: 1, paddingLeft: '25px',paddingRight:'25px', marginTop:'67px' }}>
+          <div>
+            <Button onClick={handleExpandNewPost} startIcon={<AddCircleOutlineIcon/>}>New Post</Button>
+            <Button onClick={handleSelectTopTags} startIcon={showTopTag? (<MessageIcon/>):(<LocalOfferIcon/>)}>{showTopTag? ("Top Posts"):("Top Tags")}</Button>
+          </div>
+          <Collapse in={createPostExpanded} timeout="auto" unmountOnExit>
             <TextField
-            fullWidth
-          id="outlined-multiline-static"
-          label="New Post"
-          multiline
-          rows={4}
-          defaultValue=""
-          onChange={(e)=>setPostText(e.target.value)}
-          sx={{padding:'10px', witdh:'90vw'}}
-        />
-        <div style={{padding:'10px'}}>
-        <Grid container spacing={1} direction="row" justifyContent="center" alignItems="center">
-        <Grid item>
-        <TagSearch tags={topTags} hoistTags={setSelectedTags}/>
-         </Grid>
-        <Grid item><Button variant={"outlined"} startIcon={<DeleteIcon/>} onClick={(e)=> discardNewPost(e)}>Discard</Button>
-        </Grid>
-        <Grid item>
-        <input
-        type="file"
-        multiple
-        style={{ display: 'none' }}
-        onChange={handleFileChange}
-        ref={fileInputRef}
-      />
-       
-      <Button
-        variant="outlined"
-        startIcon={<AddCircleOutlineIcon/>}
-        onClick={openFileExplorer}
-      >
-        Attach
-      </Button></Grid>
-      
-      <Grid item>
-      {selectedFiles.length > 0 ? (<div> 
-        <Button
-        variant="contained"
-        id="basic-button"
-        aria-controls={open ? 'basic-menu' : undefined}
-        aria-haspopup="true"
-        aria-expanded={open ? 'true' : undefined}
-        onClick={handleClick}
-      >
-        Files {selectedFiles.length}
-      </Button>
-        <Menu
-        id="basic-menu"
-        anchorEl={anchorEl}
-        open={open}
-        onClose={handleClose}
-        MenuListProps={{
-          'aria-labelledby': 'basic-button',
-        }}
-      >
-        {selectedFiles.map((file, i) => (
-                  <MenuItem
-                    key={`file${i}`}
-                    onClick={(e) => handleRemoveFile(e, file)}
+                  fullWidth
+                id="outlined-multiline-static"
+                label="Title"
+                multiline
+                rows={1}
+                defaultValue=""
+                onChange={(e)=>setTitleText(e.target.value)}
+                sx={{padding:'10px'}}
+              />
+              <TextField
+                fullWidth
+                id="outlined-multiline-static"
+                label="New Post"
+                multiline
+                rows={4}
+                defaultValue=""
+                onChange={(e)=>setPostText(e.target.value)}
+                sx={{padding:'10px', witdh:'90vw'}}
+              />
+              <div style={{padding:'10px'}}>
+              <Grid container spacing={1} direction="row" justifyContent="center" alignItems="center">
+                <Grid item>
+                  <TagSearch tags={topTags} hoistTags={setSelectedTags}/>
+                </Grid>
+                <Grid item>
+                  <Button variant={"outlined"} startIcon={<DeleteIcon/>} onClick={(e)=> discardNewPost(e)}>Discard</Button>
+                </Grid>
+                <Grid item>
+                <input
+                type="file"
+                multiple
+                style={{ display: 'none' }}
+                onChange={handleFileChange}
+                ref={fileInputRef}
+                />
+             
+                  <Button
+                    variant="outlined"
+                    startIcon={<AddCircleOutlineIcon/>}
+                    onClick={openFileExplorer}
                   >
-                    {file.name}
-                    <ListItemIcon>
-                      <DeleteIcon />
-                    </ListItemIcon>
-                  </MenuItem>
-                ))}
-        
-      </Menu>
+                  Attach
+                  </Button>
+                </Grid>
+            
+            <Grid item>
+            {selectedFiles.length > 0 ? (<div> 
+              <Button
+              variant="contained"
+              id="basic-button"
+              aria-controls={open ? 'basic-menu' : undefined}
+              aria-haspopup="true"
+              aria-expanded={open ? 'true' : undefined}
+              onClick={handleClick}
+            >
+              Files {selectedFiles.length}
+            </Button>
+              <Menu
+              id="basic-menu"
+              anchorEl={anchorEl}
+              open={open}
+              onClose={handleClose}
+              MenuListProps={{
+                'aria-labelledby': 'basic-button',
+              }}
+            >
+              {selectedFiles.map((file, i) => (
+                        <MenuItem
+                          key={`file${i}`}
+                          onClick={(e) => handleRemoveFile(e, file)}
+                        >
+                          {file.name}
+                          <ListItemIcon>
+                            <DeleteIcon />
+                          </ListItemIcon>
+                        </MenuItem>
+                      ))}
+              
+            </Menu>
 
       </div>): (<div></div>)}
       </Grid>

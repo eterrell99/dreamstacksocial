@@ -42,7 +42,7 @@ const formatDate = (timestamp) => {
   return `${month} ${day}, ${year}`;
 };
 
-const Post = ({ post, thread,listTags ,setListTags }) => {
+const Post = ({ post, thread, listTags ,setListTags }) => {
 
   const useStyles = makeStyles((theme) => ({
     cardContainer: {
@@ -58,7 +58,7 @@ const Post = ({ post, thread,listTags ,setListTags }) => {
     
     },
     content: {
-      
+
       paddingBottom: "8px",
     },
     actions: {

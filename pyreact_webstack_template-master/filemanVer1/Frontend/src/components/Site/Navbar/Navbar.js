@@ -8,9 +8,10 @@ import {
   Menu,
   MenuItem,
   makeStyles,
-  Avatar
+  Avatar,
+  Collapse
 } from "@material-ui/core";
-import { AccountCircle } from "@mui/icons-material";
+import { AccountCircle, TrendingUp } from "@mui/icons-material";
 import LogoutIcon from '@mui/icons-material/Logout';
 import api from "../../Services/token_refresh";
 import { useNavigate } from "react-router-dom";
@@ -43,12 +44,14 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Navbar( {expanded, setExpanded,setCreatePostExpanded}) {
   const mobile = useMediaQuery('(min-width:700px)');
+  const fullSize = useMediaQuery('(min-width:1000px)');
   const email = localStorage.getItem("email");
   const access = localStorage.getItem("access");
   const [loggedIn, setLoggedIn] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const classes = useStyles();
   const navigate = useNavigate();
+  const [searchExpand, setSearchExpand] = useState(false);
   const { userData, loading, error } = getUser(email, access);
   useEffect(() => {
     // Check if the user is logged in
@@ -136,7 +139,7 @@ export default function Navbar( {expanded, setExpanded,setCreatePostExpanded}) {
     // Mobile
     <div>
       
-      <AppBar position="static">
+      <AppBar position="fixed">
       <Toolbar >
       <Grid container direction="row"
 justifyContent="space-between"
@@ -144,32 +147,36 @@ alignItems="center">
       {loggedIn ? (
         <>
           <Grid item lg={1}>
+
           <Button onClick={() => handleHomeClick()}>
             <HomeIcon sx={{color: "white"}}/>
           </Button> 
           </Grid>
-          <Grid item lg={1}>
-          <Button onClick={() => handleExpandClick()}>
-            <Inventory2Icon sx={{color: "white"}}/>
-          </Button> 
-          </Grid>
-          <Grid item xs={6} md={3}>
-            <SearchBar/>
-          </Grid>
           
-          <Grid item lg={2}> 
-
-          <Button
+          <Grid item xs={searchExpand? 2 : 1} md={3}>
+            <SearchBar setHoistExpand={setSearchExpand}/>
+          </Grid>
+          <Collapse in={!searchExpand}>
+          <Grid item lg={1}>
+            <Button onClick={() => handleExpandClick()}>
+              <Inventory2Icon sx={{color: "white"}}/>
+            </Button> 
+          </Grid>
+          </Collapse>
+          <Grid item lg={1}> 
+          <Collapse in={!searchExpand && !fullSize && !mobile}>
+            <Button
             color="inherit"
             onClick={handleMenuOpen}
             edge="end"
             aria-label="account of current user"
             aria-haspopup="true"
+            sx={{display: searchExpand}}
             endIcon={userData ? (<Avatar src={userData.profile_pic}>{userData.profile_pic ? "":  userData.first_name.charAt(0)}</Avatar>
             ):(<AccountCircle  />)}
             
-          >
-        
+            >
+            
         
         
           </Button>
@@ -196,7 +203,9 @@ alignItems="center">
             </MenuItem>
             {/* Add other menu items for user profile, settings, etc. */}
           </Menu>
+          </Collapse>
           </Grid>
+          
         </>
       ) : (
         <>
@@ -207,12 +216,13 @@ alignItems="center">
       )}
       
       </Grid>
+      
     </Toolbar>
   </AppBar></div>
   // Desktop
   ) : (
     <div>
-      <AppBar position="static">
+      <AppBar position="fixed">
         <Toolbar >
           <Grid container direction="row"
   justifyContent="space-between"
@@ -225,15 +235,17 @@ alignItems="center">
           </Grid>
           {loggedIn ? (
             <>
+              
+              <Grid item xs={2} md={3}>
+                <SearchBar setHoistExpand={setSearchExpand}/>
+              </Grid>
+              <Collapse in={!searchExpand&& mobile}>
               <Grid item>
               <Button onClick={() => setExpanded(!expanded)}>
                 <Inventory2Icon sx={{color: "white"}}/>
               </Button> 
               </Grid>
-              <Grid item xs={2} md={3}>
-                <SearchBar ex={expanded}/>
-              </Grid>
-              
+              </Collapse>
               <Grid item>
 
               <Button

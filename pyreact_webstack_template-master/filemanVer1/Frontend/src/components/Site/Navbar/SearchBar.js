@@ -22,15 +22,16 @@ import Button from '@mui/material/Button';
 import { styled } from '@mui/material/styles';
 import { purple,white } from '@mui/material/colors';
 import useMediaQuery from '@mui/material/useMediaQuery';
-
-export default function SearchBar() {
+import { useNavigate } from 'react-router';
+export default function SearchBar( {setHoistExpand} ) {
+    //https://www.youtube.com/shorts/ST4lj7USGYs
     const [searchButton, setSearchButton] = useState(false);
     const [search, setSearch] = useState('');
     const [searchResults, setSearchResults] = useState([]);
     const [expanded, setExpanded] = useState(false);
     const [postsExpanded, setPostsExpanded] = useState(false);
-    const matches = useMediaQuery('(min-width:600px)');
-
+    const matches = useMediaQuery('(min-width:700px)');
+    const navigate = useNavigate();
     const handleSearchQuery = async (e) => {
         e.preventDefault();
         setSearch(e.target.value);
@@ -100,12 +101,22 @@ export default function SearchBar() {
         return Array.from(uniquePosts.values());
     };
 
+    const handlePostClick = (e,id) => {
+        e.preventDefault();
+        navigate(`/post/${id}/`);
+    }
+
     const handleChangeSearchButton = (button) => {
         setSearchButton(!button);
+        setHoistExpand(!button);
+        console.log(`search ${!button}`);
     };
 
     const ColorButton = styled(Button)(({ theme }) => ({
-        border:'none',
+        borderLeftColor:'#3f51b5',
+        borderTop:'color',
+        borderRightColor:'#fafafa',
+        borderRadius:search.length !== 0 ?'5% 0% 0% 0%': !searchButton? '5% 5% 5% 5%':'5% 0% 0% 5%',
         minHeight:'42px',
         color: "#3c3c3c",
         backgroundColor: "#fafafa",
@@ -116,7 +127,7 @@ export default function SearchBar() {
 
     return (
         <div>
-           <div style={{ display: 'flex', alignItems: 'center', width: !matches? '210px': '300px'}}>
+           <div style={{ display: 'flex', alignItems: 'center', width: !matches? '210px': '420px'}}>
 
            
            <ColorButton variant="contained"  onClick={()=>handleChangeSearchButton(searchButton)}>
@@ -126,20 +137,27 @@ export default function SearchBar() {
 
                 <Paper
                         component="form"
-                        sx={{display: 'flex', alignItems: 'center', width:'100%' }}
+                        sx={{display: 'flex', alignItems: 'center', width:'100%',backgroundColor: "#fafafa"}}
                     >
                 <List  direction="column"
                                     sx={{
                                         width: '100%',
+                                        minHeight:'26px',
                                         position: 'relative',
-                                        backgroundColor: 'white',
-                                        border: '1px solid #979797' 
+                                        backgroundColor: "#fafafa",
+                                        border:'0px 3px 3px 0px solid #fafafa',
+                                        
+                                        borderRadius:search.length !== 0 ?'0% 5% 0% 0%':'0% 5% 5% 0%',
+                                        borderColor:'#fafafa',
+                                        borderRightColor:'#3f51b5',
+                                        borderTopColor:'#3f51b5'
+
                                     }}> 
                
                     <InputBase
-                        sx={{ ml: 1, flex: 1, maxHeight: '25px', width:'100%'}}
+                        sx={{ maxHeight: '25px', width:'100%', borderLeftColor:'#fafafa',}}
                         placeholder="Search"
-                        inputProps={{ 'aria-label': 'search' }}
+                        inputProps={{ 'aria-label': 'search', 'color':'black' }}
                         onChange={(e) => handleSearchQuery(e)}
                     />
             
@@ -150,14 +168,18 @@ export default function SearchBar() {
                     sx={{
                         position: 'absolute',
                         top: '100%',
-                        left: 0,
+                        right:'-1px',
+                        
                         zIndex: 1,
-                        width: '100%',
-                        backgroundColor: 'white',
+                        width: !matches? '210px': '246px',
+                        // if firefox 262px
+                        backgroundColor: '#fafafa',
                         color: 'black',
                         maxHeight: '300px',
                         overflowY: 'auto',
-                        border: '1px solid #818181',
+                        border: '1px solid #3f51b5',
+                        borderTopColor:'#fafafa',
+                        borderRadius: '0% 0% 5% 5%',
                         
                     }}
                 >
@@ -199,7 +221,7 @@ export default function SearchBar() {
                                 
                                 <Collapse in={postsExpanded} timeout="auto" unmountOnExit>
                                 {getUniquePosts().map((post, index) => (
-                                            <ListItemButton key={index} sx={{ pl: 4 }}>
+                                            <ListItemButton key={index} sx={{ pl: 4 }} onClick={(e)=> handlePostClick(e,post.id)}>
                                                 <ListItemIcon>
                                                 {post.user.profile_pic ? (<Avatar src={post.user.profile_pic}>{post.user.profile_pic ? "":  post.user.first_name.charAt(0)}</Avatar>
                                                 ):(<MessageIcon  fontSize="large" />)}
