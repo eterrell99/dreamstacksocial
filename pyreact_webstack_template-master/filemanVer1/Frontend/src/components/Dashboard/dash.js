@@ -173,10 +173,21 @@ export default function Dash() {
         <TagsList expanded={expanded} setExpanded={setExpanded} tag={tagParent} setTags={setTagParent}/>
         
         <div style={{ flex: 1, paddingLeft: '25px',paddingRight:'25px', marginTop:'67px' }}>
-          <div>
-            <Button onClick={handleExpandNewPost} startIcon={<AddCircleOutlineIcon/>}>New Post</Button>
-            <Button onClick={handleSelectTopTags} startIcon={showTopTag? (<MessageIcon/>):(<LocalOfferIcon/>)}>{showTopTag? ("Top Posts"):("Top Tags")}</Button>
-          </div>
+          <Grid container 
+            direction="row"
+            justifyContent="center"
+            alignItems="center">
+                <Grid item>
+                <Button onClick={handleExpandNewPost} startIcon={<AddCircleOutlineIcon/>}>New Post</Button>
+                </Grid>
+                <Grid item>
+                <Button onClick={handleSelectTopTags} startIcon={showTopTag? (<MessageIcon/>):(<LocalOfferIcon/>)}>{showTopTag? ("Top Posts"):("Top Tags")}</Button>
+          
+                </Grid>
+
+          </Grid>
+            
+            
           <Collapse in={createPostExpanded} timeout="auto" unmountOnExit>
             <TextField
                   fullWidth

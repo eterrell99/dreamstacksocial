@@ -32,6 +32,11 @@ class FileSerializer(serializers.ModelSerializer,BulkSerializerMixin):
         representation = super().to_representation(instance)
         representation['type'] = instance.file.url.split('.')[-1]  # Extracting the file type from the URL
         return representation
+    
+    def create(self, validated_data):
+        # Convert the filename to lowercase before saving
+        validated_data['file'].name = validated_data['file'].name.lower()
+        return super().create(validated_data)
 
 class PostSerializer(serializers.ModelSerializer):
     like_count = serializers.SerializerMethodField()

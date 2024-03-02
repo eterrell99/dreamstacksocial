@@ -84,7 +84,7 @@ export default function Navbar( {expanded, setExpanded,setCreatePostExpanded}) {
 
   const handleNavigateHome = (e) => {
       e.preventDefault();
-      navigate('/');
+      navigate('/dash/');
   };
   const handleNavigateProfile = (e) => {
     e.preventDefault();

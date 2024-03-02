@@ -57,11 +57,16 @@ export default function TagSlash() {
     <div>
 
         <Navbar expanded={expanded} setExpanded={setExpanded} />
-        <Card sx={{marginBottom:"20px"}}>
+        <div style={{marginTop:'70px'}}> 
+        <Card sx={{marginBottom:"20px" }}>
             <TagsList expanded={expanded}/>
         
               <CardContent>
-                <Grid container spacing={4}> 
+                <Grid container 
+                direction="row"
+                justifyContent="center"
+                alignItems="center" 
+                spacing={4}> 
                     <Grid item>
                         <Typography variant="h6" component="div">
                   { tagData ? (tagData[0].name) : ("")}
@@ -83,7 +88,11 @@ export default function TagSlash() {
                 
               </CardContent>
             </Card>
-            <Grid container>
+            </div>
+            <Grid container 
+              direction="row"
+              justifyContent="center"
+              alignItems="center">
                 <Grid item>
                     <Button>Likes</Button>
                 </Grid>
