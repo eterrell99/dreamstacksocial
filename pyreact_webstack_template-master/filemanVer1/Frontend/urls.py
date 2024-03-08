@@ -9,7 +9,8 @@ urlpatterns = [
     path('post/<int:id>/',index ),
     path('ee/',index),
     path('ee/<str:eeID>/', index),
-    path('dash/',index)
+    path('dash/',index),
+    path('suser/<int:it>/',index)
 
 
 ]

@@ -13,7 +13,7 @@ import { Provider } from 'react-redux';
 import TagSlash from './components/Dashboard/Tags/tagSlash';
 import TagDash from './components/Dashboard/Tags/tagDash';
 import Homepage from './components/Site/Navbar/Home/home';
-
+import SUser from './components/Users/user';
 function App() {
   return (
     <Router>
@@ -24,10 +24,11 @@ function App() {
         <Route path="/post/:post/" element={<ExpandedPost/>}/>
         <Route path="/signup/" element={<Register/>}/>
         <Route path="/login/" element={<SignIn/>}/>
+        <Route path="/suser/:uid/" element={<SUser/>}/>
         <Route path="/Profile/" element={<Profile/>}/>
         <Route path="/ee/" element={<TagDash/>}/>
         <Route path="/ee/:eee/" element={<TagSlash/>}/>
-        
+
       </Routes>
     </Router>
   );

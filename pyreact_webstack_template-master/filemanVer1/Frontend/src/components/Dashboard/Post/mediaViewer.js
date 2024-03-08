@@ -48,7 +48,7 @@ function ImageViewer({ files }) {
   const supportedVideoExtensions = ['mp4', 'webm', 'ogg'];
 
   const getFileExtension = (url) => {
-    return url.split('.').pop().toLowerCase();
+    return url.split('.').pop();
   };
 
   const isImageFile = (url) => {
@@ -63,17 +63,24 @@ function ImageViewer({ files }) {
 
   const renderMediaContent = () => {
     if (currentFile && currentFile.file) {
-      const url = currentFile.file.toLowerCase();
+      const url = currentFile.file;
       if (isImageFile(url)) {
         console.log(url);
         return (
           <img src={url} alt={`Image ${currentIndex}`} style={{ ...mediaContainerStyle, objectFit: 'cover', cursor: 'pointer' }} onClick={openImage} />
         );
       } else if (isVideoFile(url)) {
+        console.log(url);
+        console.log('video');
         return (
-          <ReactPlayer url={url} controls={true} className='react-player' width='100%' height='100%'/>
+          <ReactPlayer url={url} controls={true} className='react-player'/>
         );
       }
+      else {
+        return (
+          <Button>{isImageFile(url) ? 'image file': isVideoFile(url) ? 'videofile': 'confuse'}</Button>
+        );
+      };
     }
     return null;
   };
