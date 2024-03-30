@@ -35,12 +35,10 @@ class TagSaves(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     tag = models.ForeignKey(Tag, on_delete=models.CASCADE, related_name='tag_saves')
 
-
 class PostSaves(models.Model):    
     post = models.ForeignKey(Posts, on_delete=models.CASCADE, related_name='post_saves')
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     
-
 class CommentLikes(models.Model):
     comment = models.ForeignKey(Comment, on_delete=models.CASCADE, related_name='comment_likes')
     user = models.ForeignKey(User, on_delete=models.CASCADE)

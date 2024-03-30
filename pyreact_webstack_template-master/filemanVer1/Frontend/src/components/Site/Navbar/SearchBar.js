@@ -49,6 +49,11 @@ export default function SearchBar( {setHoistExpand} ) {
             }
         }
     };
+    const handleNavUser = (e, id) => {
+        e.preventDefault();
+        setSearch('');
+        navigate(`/suser/${id}/`);
+    };
 
     const handleOpenUser = () => {
         setExpanded(!expanded);
@@ -159,6 +164,7 @@ export default function SearchBar( {setHoistExpand} ) {
                         placeholder="Search"
                         inputProps={{ 'aria-label': 'search', 'color':'black' }}
                         onChange={(e) => handleSearchQuery(e)}
+                        value={search}
                     />
             
                 <Collapse
@@ -200,7 +206,7 @@ export default function SearchBar( {setHoistExpand} ) {
                                 <Collapse in={expanded} timeout="auto" unmountOnExit>
                                     <List component="div" disablePadding>
                                         {getUniqueUsers().map((user, index) => (
-                                            <ListItemButton key={index} sx={{ pl: 4 }}>
+                                            <ListItemButton key={index} sx={{ pl: 4 }} onClick={(e)=> handleNavUser(e,user.id)}>
                                                 <ListItemIcon>
                                                 {user.profile_pic ? (<Avatar src={user.profile_pic}>{user.profile_pic ? "":  userData.first_name.charAt(0)}</Avatar>
                                                 ):(<AccountCircle   fontSize="large"/>)}

@@ -62,3 +62,9 @@ class User(AbstractBaseUser,PermissionsMixin):
     def has_module_perms(self, app_label):
         return True
 
+class UserSaves(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user_saved = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_saved')
+    # save_group = models.ForeignKey('SaveGroup', on_delete=models.CASCADE, null=True, blank=True)
+    def __str__(self):
+        return self.user.username + ' -- ' + self.user_saved.username

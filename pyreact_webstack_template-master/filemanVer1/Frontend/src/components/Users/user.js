@@ -13,9 +13,12 @@ import {
   IconButton,
   Collapse,
   makeStyles,
+  CardHeader,
 } from "@material-ui/core";
+import InventoryIcon from '@mui/icons-material/Inventory';
 import TextField from '@mui/material/TextField';
 import Grid from "@material-ui/core/Grid";
+import NotesIcon from '@mui/icons-material/Notes';
 import Menu from '@mui/material/Menu';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import MenuItem from '@mui/material/MenuItem';
@@ -28,8 +31,44 @@ import MessageIcon from '@mui/icons-material/Message';
 import { useNavigate } from "react-router";
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useParams } from "react-router-dom";
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import ScheduleIcon from '@mui/icons-material/Schedule';
+import KeyboardArrowDownOutlinedIcon from '@mui/icons-material/KeyboardArrowDownOutlined';
+import KeyboardArrowUpOutlinedIcon from '@mui/icons-material/KeyboardArrowUpOutlined';
+import UserSaved from "./userSave";
 export default function SUser() {
-    const { uid } = useParams();
+  
+  const { uid } = useParams();
+  const [userPosts, setUserPosts] = useState([]);
+  const formatDate = (date) => {
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    return new Date(date).toLocaleDateString(undefined, options);
+  };
+  useEffect(() => {
+      const fetchData = async () => {
+          try {
+              if (uid) {
+                  const response = await api.get(`/post/user/${uid}/`, {
+                      headers: {
+                          Authorization: `Bearer ${localStorage.getItem('access')}`,
+                      },
+                  });
+                  setUserPosts(response.data);
+                  console.log(`postsUser - ${uid} loaded`);
+              } else {
+                  console.error("User data or user ID is null or undefined.");
+              }
+          } catch (error) {
+              console.error("Error fetching posts:", error);
+              // Handle the error as needed
+          }
+      };
+
+      fetchData();
+
+  }, [uid]);
+
+    const [postExpanded, setPostExpanded] = useState();
     const navigate = useNavigate();
     const email = localStorage.getItem("email");
     const access = localStorage.getItem("access");
@@ -46,11 +85,17 @@ export default function SUser() {
     const [selectedTags, setSelectedTags] = useState();
     const [showTopTag, setShowTopTag] = useState(false);
     const [tagParent, setTagParent] = useState();
-    const matches = useMediaQuery('(min-width:600px)'); 
+    const xsx = useMediaQuery('(min-width:600px)');
+    const smx = useMediaQuery('(min-width:700px)');
+    const mdx = useMediaQuery('(min-width:950px)');    
     const [uData, setUData] = useState();
-    // Submit requset
-    //  
     
+
+    const handlePostExpaned = (e,postID) => {
+      e.preventDefault();
+      setPostExpanded(postID);
+    };
+
     useEffect(() => {
         const fetchSUser = async () => {
           try {
@@ -177,29 +222,94 @@ export default function SUser() {
         return <div>Error: {error.message}</div>;
       }
       
+      const handleFilter = (e,filterby) => {
+        e.preventDefault();
+        if (filterby === 'likes') {
+          // Sort by likes
+          const sortedPosts = [...userPosts].sort((a, b) => b.like_count - a.like_count);
+          setUserPosts(sortedPosts);
+        }
+       else if (filterby === 'comments') { 
+          //Sort by comment_count
+          const sortedPosts = [...userPosts].sort((a, b) => b.comment_count - a.comment_count);
+          setUserPosts(sortedPosts);
+       }
+        
+        else if (filterby === 'date') {
+          // Sort by date
+          //from newest to oldest
+          const sortedPosts = [...userPosts].sort((a, b) => new Date(b.created) - new Date(a.created));
+          setUserPosts(sortedPosts);
+        }
+          
+      else {
+          console.error('Invalid filter type');
+        }
+      };
 
 
+      const useStyles = makeStyles((theme) => ({
+        root: {
+          marginLeft: xsx ? '5%' : '2%',
+          marginRight: xsx ? '5%' : '2%',
+          
+          background: 'linear-gradient(to right, #ffffff, #f3f3f3)',
+        },
+        bioCard: {
+          height: '36vh',
+          padding: '7px',
+        },
+        topPostsCard: {
+          height: '36vh',
+          padding: '7px',
+        },
+        avatarContainer: {
+          
+          justifyContent: 'center',
+          alignItems: 'center',
+        },
+        userAvatar: {
+          
+          width: '150px',
+          height: '150px',
+          borderRadius: '0%',
+          objectFit: 'cover',
+          boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.2)',
+          background: 'linear-gradient(to right, #ffffff, transparent)',
+        },
+        
+      }));
+
+  
+      const classes = useStyles();
 
       //files
   
     return (
-      <div>
+      <div >
         <Navbar expanded={expanded} setExpanded={setExpanded} setCreatePostExpanded={setCreatePostExpanded}/>
-      <div style={{ display: "flex" }}>
+      <div style={{ display: "flex", }} >
         
         {/* Render the TagsList component */}
         
         <TagsList expanded={expanded} setExpanded={setExpanded} tag={tagParent} setTags={setTagParent}/>
         
-        <div style={{ flex: 1, paddingLeft: '25px',paddingRight:'25px', marginTop:'67px' }}>
+        <div style={{ flex: 1, marginTop:'67px'}}>
           <Grid container 
+
             direction="row"
             justifyContent="center"
             alignItems="center">
                 <Grid item>
                 <Button onClick={handleExpandNewPost} startIcon={<AddCircleOutlineIcon/>}>New Post</Button>
+                
                 </Grid>
-
+                <Grid item>
+              <Button startIcon={<LocalOfferIcon/>}>Top Tags</Button>
+              </Grid>
+              <Grid item>
+              <Button startIcon={<MessageIcon/>}>Top Posts</Button>
+              </Grid>
 
           </Grid>
             
@@ -294,7 +404,122 @@ export default function SUser() {
         </Grid>
         </div>
             </Collapse>
-        <Typography>{uData ? uData.username: ''}</Typography>
+        <div className={classes.root}>
+        <Grid container spacing={2} direction="row" justifyContent="center" alignItems="center">
+          {/* card 1  Profile Card*/}
+          <Grid item xs={12} sm={8} md={6}>
+            <Card >
+              <Grid container direction="row" spacing={2}>
+                <Grid item sx={4} md={4} lg={4} className={classes.avatarContainer}>
+                  <Avatar className={classes.userAvatar} src={uData? uData.profile_pic: ''}></Avatar>
+                </Grid>
+              
+                <Grid item xs={6} md={6} lg={6}>
+                  <Grid container direction="row" justifyContent="center" alignItems="center">
+                  <Grid item xs={3}>
+                      <Button startIcon={<FavoriteIcon/>}>{uData? uData.total_like_count : "na"}</Button>
+                    </Grid>
+                    <Grid item xs={3}>
+                      <Button startIcon={<MessageIcon/>}> {uData? uData.posts_count : "na"}</Button>
+                    </Grid>
+                    <Grid item xs={3}>
+                    <Button startIcon={<NotesIcon/>}> {uData? uData.comments_count : "na"}</Button>
+                    </Grid>
+                    <Grid item xs={3}>
+                    <UserSaved id={uData? uData.id : 0} />
+                    </Grid>
+                  </Grid>
+                  <Typography>{uData ? uData.username: ''} - {uData ? uData.title: ''}</Typography>
+                  <Typography>{uData ? uData.bio: ''}</Typography>
+                  </Grid>
+
+                </Grid>
+            
+            
+            
+           
+            </Card>
+                
+            
+          </Grid> 
+          <Grid item xs={12} sm={4} md={6} >
+            <Card>
+              <Typography>Featured</Typography>
+            </Card>
+          </Grid>
+          <Grid item>
+          <Typography></Typography>  
+          </Grid>
+          <Grid item xs={12} sm={6} md={6} >
+            <Card>
+              <CardHeader title="Top Posts" action={<Grid container spacing={1}>
+                <Grid item>
+                  <Button onClick={(e)=>handleFilter(e,'likes')}><FavoriteIcon/></Button>
+                  </Grid>
+                  <Grid item>
+                  <Button onClick={(e)=>handleFilter(e, 'comments')}><NotesIcon/></Button>
+                  </Grid>
+                  <Grid item>
+                  <Button onClick={(e)=>handleFilter(e,'date')}><ScheduleIcon/></Button>
+                  </Grid>
+                 </Grid>} />
+              <CardContent>
+                <Grid container direction="column" spacing={1}> 
+                {userPosts ? userPosts.map((post) => (
+                  <Grid item xs={12} key={post.id}>
+                    <Card>
+                    <CardHeader 
+                    title={post.title}
+                     subheader={formatDate(post.created)}
+                     action={
+                      <Grid container spacing={1}>
+                        <Grid item>  
+                          <Button startIcon={<FavoriteIcon/>}>{post.like_count}</Button>
+                        </Grid>
+                        <Grid item> 
+                          <Button startIcon={<NotesIcon/>}>{post.comment_count}</Button>
+                        </Grid>
+                      
+                        <Grid item>
+                          <Button onClick={(e)=>handlePostExpaned(e, postExpanded !== post.id ? post.id : null)} 
+                              startIcon={postExpanded !== post.id ? <KeyboardArrowDownOutlinedIcon/> : <KeyboardArrowUpOutlinedIcon/>}
+                          />
+                        </Grid>
+
+                      </Grid>
+                      
+                      }>
+
+                      </CardHeader>
+                      
+                      <Collapse in={postExpanded === post.id} timeout="auto" unmountOnExit>
+                      <CardContent>
+                        <Typography>{post.text}</Typography>  </CardContent>
+
+                        </Collapse>
+                       
+                     
+                      
+                      </Card>
+                  </Grid>
+                )) 
+                : "Loading"}
+                </Grid>
+                
+              </CardContent>
+              
+            </Card>
+            
+          </Grid>
+          <Grid item>
+          <Typography></Typography>  
+          </Grid>
+          </Grid>          
+
+       
+          </div>        
+        
+
         </div>
       </div>
       </div>
@@ -302,3 +527,11 @@ export default function SUser() {
 
 
 }
+
+
+
+
+
+
+
+// Currently relying on fixed height for cards. If we want to have card heights that are dynamic, we will have to play with profile image sizing possibly aspect ration or abandon.

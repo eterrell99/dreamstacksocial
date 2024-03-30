@@ -1,14 +1,18 @@
+
+
 import React, { useState, useEffect,useRef   } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Card,
   CardContent,
+  CardActions,
   Typography,
   Avatar,
   IconButton,
   Collapse,
   makeStyles,
   Button,
+  CardHeader,
 } from "@material-ui/core";
 import ImageViewer from "./mediaViewer";
 import Menu from '@mui/material/Menu';
@@ -31,7 +35,12 @@ import Inventory2Icon from '@mui/icons-material/Inventory2';
 import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArrowRight';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import PostSaved from "./userPostSave";
+
 const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+import "./post.css";
+
+
 
 const formatDate = (timestamp) => {
 
@@ -51,10 +60,17 @@ const Post = ({ post, thread, listTags ,setListTags }) => {
       paddingBottom: '7px',
       
     },
+    header: {
+      marginTop: "0px",
+      
+    },
     card: {
-      maxWidth: thread ? "78vw" : "78vw", // Adjust the maxWidth
-      padding: "16px", // Apply padding only if it's a thread
-      width: thread ? "80%" : "auto",
+      margin: theme.spacing(1),
+      maxWidth: thread ? "60vw" : "60w", // Adjust the maxWidth
+      padding:"6px",
+      marginTop: thread? "72px": "0px", // Apply padding only if it's a thread
+      width: thread ? "69%" : "69%" ,
+      borderRadius: "8px",
     
     },
     content: {
@@ -65,6 +81,7 @@ const Post = ({ post, thread, listTags ,setListTags }) => {
       display: "flex",
       justifyContent: "space-between",
       alignItems: "center",
+      marginTop: "0px",
     },
     timestamp: {
       fontSize: "0.875rem",
@@ -73,6 +90,7 @@ const Post = ({ post, thread, listTags ,setListTags }) => {
     tags: {
       marginTop: "8px",
     },
+
   }));
 
   const {
@@ -88,6 +106,11 @@ const Post = ({ post, thread, listTags ,setListTags }) => {
     files
   } = post;
   
+  const toggleMediaExpanded = () => {
+    setMediaExpanded(!mediaExpanded);
+  };
+
+  const [mediaExpanded, setMediaExpanded] = useState(false);
   const [likeCountState, setLikeCountState] = useState(like_count);
   const [hasLiked, setHasLiked] =useState(user_has_liked);
   const [expanded, setExpanded] = useState(false);
@@ -98,6 +121,7 @@ const Post = ({ post, thread, listTags ,setListTags }) => {
   const [commentPostText, setCommentPostText] = useState();
   const [postSaved, setPostSaved] = useState(post.user_has_saved);
   const navigate = useNavigate();
+  const [tagsExpanded,setTagsExpanded] = useState(false);
   const handleSubmitPostComment = (e) => {
     e.preventDefault()
       if (commentPostText) {
@@ -120,6 +144,10 @@ const Post = ({ post, thread, listTags ,setListTags }) => {
     e.preventDefault();
     navigate(`/ee/${tag.name}/`)
   }
+
+  const handleSetTagsExpanded = () => { 
+    setTagsExpanded(!tagsExpanded); 
+  };
 
   const handleLikeClick = () => {
     if (hasLiked===false){const addLike = async () => {
@@ -210,166 +238,266 @@ const Post = ({ post, thread, listTags ,setListTags }) => {
     const handleClose = () => {
       setAnchorEl(null);
     };
-
+    const handleSUserClick = (e,uid) => {
+      e.preventDefault();
+      navigate(`/suser/${uid}/`);
+    } 
     
 
   return (
     <div className={classes.cardContainer}>
-    <Card className={classes.card} variant="outlined">
-      <CardContent className={classes.content}>
-        <Grid container spacing={2} direction="row" justifyContent="space-between" alignItems="center" >
-          <Grid item>
-            <Avatar className={classes.avatar} src={user.profile_pic}>{user.profile_pic ? "":  user.first_name.charAt(0)}</Avatar>
-            </Grid>
-          <Grid item>
-            <Typography variant="subtitle2" className={classes.timestamp}>
-               {user.first_name} {user.last_name} on {formatDate(created)}
-          </Typography>
-          </Grid>
-          <PostSaved id={id} saved={postSaved} setTags={setListTags}/>
-          <Grid item>
-              {thread ? (<div></div>): (<Button variant={"contained"} onClick={() => navigate(`/post/${id}/`)} endIcon={<KeyboardDoubleArrowRightIcon/>}>See Thread</Button>)}
-          </Grid>
-          
-        </Grid>  
-        <Typography variant="h6">{title}</Typography>
+      <Card className={classes.card} variant="outlined">
       
-        {files.length > 0 ? (<ImageViewer files={files} />) : <div></div> }
-        <Typography variant="body1">{text}</Typography>
-        {/* If more than 2-3 tags, store tags in a dropdown. ex: [sports] +3 more */}
-        {tags.length > 0 && (
-          <div className={classes.tags}>
-            <Typography variant="subtitle2">Tags:</Typography>
-            {tags.map((tag) => (
-              <Button
-                onClick={(e)=>tagClick(e,tag)}
-                key={tag.id}
-                variant="outlined"
-                size="small"
-                style={{ marginRight: "8px", marginBottom: "8px" }}
-              >
-                {tag.name}
-              </Button>
-            ))}
-          </div>
-        )}
+        <CardHeader
+        classeName={classes.header}
+          avatar={
+            <Avatar aria-label="recipe" src={user.profile_pic}>
+              {user.profile_pic ? "" : user.first_name.charAt(0)}
+            </Avatar>
+          }
+          title={
+            <Button
+              variant="outlined"
+              onClick={(e) => {
+                handleSUserClick(e, user.id);
+              }}
+            >
+              {user.first_name + " " + user.last_name}
+            </Button>
+          }
+          subheader={formatDate(created)}
+          action={
+            
+            <Grid
+              container
+              direction="row"
+              justifyContent="center"
+              alignItems="center"
+              spacing={2}
+            >
+              <PostSaved id={id} saved={postSaved} setTags={setListTags} />
 
-        <div className={classes.actions}>
-          <div>
-              
-            {hasLiked ? (
-            <IconButton onClick={handleLikeClick}>
-              <FavoriteIcon color="primary" />
-            </IconButton> 
-             ):(<IconButton onClick={handleLikeClick}>
-                <FavoriteBorderIcon color="primary" />
-              </IconButton>
+              <Grid item>
+                {thread ? (
+                  <div></div>
+                ) : (
+                  <Button
+                    variant="outlined"
+                    onClick={() => navigate(`/post/${id}/`)}
+                    endIcon={<KeyboardDoubleArrowRightIcon />}
+                  >
+                    See Thread
+                  </Button>
                 )}
+              </Grid>
+            </Grid>
             
-            {likeCountState} Likes
+          }
+          sx={{ marginTop: "0px" } }
+        ></CardHeader>
+        <CardContent className={classes.content}>
+          <Typography variant="h6">{title}</Typography>
 
+          {files.length > 0 ? (
+            <ImageViewer
+              files={files}
+              expand={mediaExpanded}
+              setExpanded={setMediaExpanded}
+              toggleMediaExpanded={toggleMediaExpanded}
+            />
+          ) : (
+            <div></div>
+          )}
+          <Typography variant="body1">{text}</Typography>
+          {/*  */}
 
-          </div>
-          <div>
-          <IconButton
-              onClick={handlePostCommentClick}
-              aria-expanded={postCommentExpanded}
-              aria-label="show more"
-            >
-              <CreateIcon/>
-            </IconButton>      
-            
+          {tags.length > 0 && (
+            <div className={classes.tags}>
+              {tags.slice(0, 3).map((tag) => (
+                <Button
+                  onClick={(e) => tagClick(e, tag)}
+                  key={tag.id}
+                  variant="outlined"
+                  size="small"
+                  style={{ marginRight: "8px", marginBottom: "8px" }}
+                >
+                  {tag.name}
+                </Button>
+              ))}
+              {tags.length > 3 && (
+                <div>   
+                <Button onClick={handleSetTagsExpanded} >{`+${tags.length - 3}`}</Button>
+                <Collapse in={tagsExpanded} timeout="auto" unmountOnExit>
+                  {tags.slice(3).map((tag) => (
+                    <Button
+                      onClick={(e) => tagClick(e, tag)}
+                      key={tag.id}
+                      variant="outlined"
+                      size="small"
+                      style={{ marginRight: "8px", marginBottom: "8px" }}
+                    >
+                      {tag.name}
+                    </Button>
+                  ))}
+                </Collapse>
+                </div>
+              )}
+            </div>
+          )}
+
+          <div className={classes.actions} style={{ marginTop: "0px" }}>
+            <div>
+              {hasLiked ? (
+                <IconButton onClick={handleLikeClick}>
+                  <FavoriteIcon color="primary" />
+                </IconButton>
+              ) : (
+                <IconButton onClick={handleLikeClick}>
+                  <FavoriteBorderIcon color="primary" />
+                </IconButton>
+              )}
+
+              {likeCountState} Likes
+            </div>
+            <div>
+              <IconButton
+                onClick={handlePostCommentClick}
+                aria-expanded={postCommentExpanded}
+                aria-label="show more"
+              >
+                <CreateIcon />
+              </IconButton>
+            </div>
+
+            <div>
+              {comment_count} Comments
+              {comment_count > 0 ? (
+                <IconButton
+                  onClick={handleExpandClick}
+                  aria-expanded={expanded}
+                  aria-label="show more"
+                >
+                  <ExpandMoreIcon />
+                </IconButton>
+              ) : (
+                <div></div>
+              )}
+            </div>
           </div>
 
-          <div>
-            {comment_count} Comments
-            {comment_count > 0 ? (<IconButton
-              onClick={handleExpandClick}
-              aria-expanded={expanded}
-              aria-label="show more"
-            >
-              <ExpandMoreIcon />
-            </IconButton>) : (<div></div>)}
-            
-          </div>
-        </div>
-        
-        <Collapse in={postCommentExpanded} timeout="auto" unmountOnExit>
-          
+          <Collapse in={postCommentExpanded} timeout="auto" unmountOnExit>
             <TextField
-            fullWidth
-          id="outlined-multiline-static"
-          label="Add Comment"
-          multiline
-          rows={4}
-          defaultValue=""
-          onChange={(e)=>setCommentPostText(e.target.value)}
-        /> 
-        <Grid container direction="row" justifyContent="center"
-  alignItems="center">
-        <Grid item><Button variant={"outlined"} startIcon={<DeleteIcon/>} onClick={(e)=> discardComment(e)}>Discard</Button>
-        </Grid>
-        <Grid item>
-        <input
-        type="file"
-        multiple
-        style={{ display: 'none' }}
-        onChange={handleFileChange}
-        ref={fileInputRef}
-      />
-       
-      <Button
-        variant="outlined"
-        startIcon={<AddCircleOutlineIcon/>}
-        onClick={openFileExplorer}
-      >
-        Attach
-      </Button></Grid>
-      
-      <Grid item>
-      {selectedFiles.length > 0 ? (<div> 
-        <Button
-        variant="contained"
-        id="basic-button"
-        aria-controls={open ? 'basic-menu' : undefined}
-        aria-haspopup="true"
-        aria-expanded={open ? 'true' : undefined}
-        onClick={handleClick}
-      >
-        Files {selectedFiles.length}
-      </Button>
-        <Menu
-        id="basic-menu"
-        anchorEl={anchorEl}
-        open={open}
-        onClose={handleClose}
-        MenuListProps={{
-          'aria-labelledby': 'basic-button',
-        }}
-      >
-        {selectedFiles.map((file, i)=> (<MenuItem key={'file'+i} onClick={(e)=> handleRemoveFile(e,file)}>{file[0].name}<ListItemIcon><DeleteIcon/></ListItemIcon></MenuItem>
-        ))}
-        
-      </Menu>
+              fullWidth
+              id="outlined-multiline-static"
+              label="Add Comment"
+              multiline
+              rows={4}
+              defaultValue=""
+              onChange={(e) => setCommentPostText(e.target.value)}
+              
+            />
+            <Grid
+              container
+              direction="row"
+              justifyContent="center"
+              spacing={2}
+              sx={{ marginTop: "8px" }}
+              alignItems="center"
+            >
+              <Grid item>
+                <Button
+                  variant={"outlined"}
+                  startIcon={<DeleteIcon />}
+                  onClick={(e) => discardComment(e)}
+                >
+                  Discard
+                </Button>
+              </Grid>
+              <Grid item>
+                <input
+                  type="file"
+                  multiple
+                  style={{ display: "none" }}
+                  onChange={handleFileChange}
+                  ref={fileInputRef}
+                />
 
-      </div>): (<div></div>)}
-      </Grid>
-        <Grid item>
-          <Button variant={'contained'} startIcon={<ReplyIcon/>} onClick={(e)=>handleSubmitPostComment(e)}>Submit</Button>
-        </Grid>
-        </Grid> </Collapse>
-        <Collapse in={expanded} timeout="auto" unmountOnExit>
-        {topComments ? (
-  topComments.map((comment) => (
-    <Comment key={comment.id} comment={comment} setNewComment={setNewComment} postID={id} onDeleteComment={handleDeleteComment}/> 
-  ))
-) : (
-  <div></div>
-)}
-        </Collapse>
-        
-      </CardContent>
-    </Card>
+                <Button
+                  variant="outlined"
+                  startIcon={<AddCircleOutlineIcon />}
+                  onClick={openFileExplorer}
+                >
+                  Attach
+                </Button>
+              </Grid>
+
+              <Grid item>
+                {selectedFiles.length > 0 ? (
+                  <div>
+                    <Button
+                      variant="contained"
+                      id="basic-button"
+                      aria-controls={open ? "basic-menu" : undefined}
+                      aria-haspopup="true"
+                      aria-expanded={open ? "true" : undefined}
+                      onClick={handleClick}
+                    >
+                      Files {selectedFiles.length}
+                    </Button>
+                    <Menu
+                      id="basic-menu"
+                      anchorEl={anchorEl}
+                      open={open}
+                      onClose={handleClose}
+                      MenuListProps={{
+                        "aria-labelledby": "basic-button",
+                      }}
+                    >
+                      {selectedFiles.map((file, i) => (
+                        <MenuItem
+                          key={"file" + i}
+                          onClick={(e) => handleRemoveFile(e, file)}
+                        >
+                          {file[0].name}
+                          <ListItemIcon>
+                            <DeleteIcon />
+                          </ListItemIcon>
+                        </MenuItem>
+                      ))}
+                    </Menu>
+                  </div>
+                ) : (
+                  <div></div>
+                )}
+              </Grid>
+              <Grid item>
+                <Button
+                  variant={"contained"}
+                  startIcon={<ReplyIcon />}
+                  onClick={(e) => handleSubmitPostComment(e)}
+                >
+                  Submit
+                </Button>
+              </Grid>
+            </Grid>{" "}
+          </Collapse>
+          <Collapse in={expanded} timeout="auto" unmountOnExit>
+            {topComments ? (
+              topComments.map((comment) => (
+                <Comment
+                  key={comment.id}
+                  comment={comment}
+                  setNewComment={setNewComment}
+                  postID={id}
+                  onDeleteComment={handleDeleteComment}
+                />
+              ))
+            ) : (
+              <div></div>
+            )}
+          </Collapse>
+        </CardContent>
+      </Card>
     </div>
   );
 };

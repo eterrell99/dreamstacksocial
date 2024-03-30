@@ -49,7 +49,7 @@ const PostSaved = ({id, saved,setTags}) => {
   return (
     <div >
           <Grid item>
-            {isSaved? (<Button onClick={(e)=> handlePostSaveClick(e)} startIcon={<DeleteForeverIcon/>}></Button>):(<Button onClick={(e)=> handlePostSaveClick(e)} variant={"outlined"} startIcon={<Inventory2Icon/>}> Save</Button>)}
+            {isSaved? (<Button variant="outlined" onClick={(e)=> handlePostSaveClick(e)} startIcon={<DeleteForeverIcon/>}>Unsave</Button>):(<Button onClick={(e)=> handlePostSaveClick(e)} variant={"outlined"} startIcon={<Inventory2Icon/>}> Save</Button>)}
           </Grid>
           
     </div>

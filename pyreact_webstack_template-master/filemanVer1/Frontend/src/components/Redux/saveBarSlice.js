@@ -17,6 +17,6 @@ export const savebarSlice = createSlice({
 })
 
 // Action creators are generated for each case reducer function
-export const { setSaveList} = savebarSlice.actions;
+export const { setSaveList } = savebarSlice.actions;
 
 export default savebarSlice.reducer;

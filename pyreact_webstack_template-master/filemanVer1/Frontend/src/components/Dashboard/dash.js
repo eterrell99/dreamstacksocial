@@ -24,12 +24,28 @@ import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import ReplyIcon from '@mui/icons-material/Reply';
 import DeleteIcon from '@mui/icons-material/Delete';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer';
-import TagDash from '../Dashboard/Tags/tagDash'
 import MessageIcon from '@mui/icons-material/Message';
+import TagDash from '../Dashboard/Tags/tagDash'
 import { useNavigate } from "react-router";
 import useMediaQuery from '@mui/material/useMediaQuery';
-
+import AutoAwesomeMosaicIcon from '@mui/icons-material/AutoAwesomeMosaic';
+import AutoAwesomeMosaicOutlinedIcon from '@mui/icons-material/AutoAwesomeMosaicOutlined';
+import { ClassNames } from "@emotion/react";
 export default function Dash() {
+  
+  
+  const useStyles = makeStyles((theme) => ({
+    button4u: {
+      border : '1px solid',
+      borderRadius: '10px',
+      borderColor: 'black',
+    },
+  }));
+
+  const classes = useStyles();
+
+
+
     const navigate = useNavigate();
     const email = localStorage.getItem("email");
     const access = localStorage.getItem("access");
@@ -46,9 +62,14 @@ export default function Dash() {
     const [showTopTag, setShowTopTag] = useState(false);
     const [tagParent, setTagParent] = useState();
     const matches = useMediaQuery('(min-width:600px)'); 
+
+
     // Submit requset
     //
-     
+    
+
+
+
     const handleSubmitPost = async (e) => {
       e.preventDefault();
     
@@ -176,13 +197,13 @@ export default function Dash() {
           <Grid container 
             direction="row"
             justifyContent="center"
-            alignItems="center">
+            alignItems="center"
+            spacing={2} sx={{marginTop:'7px', marginBottom:'7px'}}>
                 <Grid item>
                 <Button onClick={handleExpandNewPost} startIcon={<AddCircleOutlineIcon/>}>New Post</Button>
                 </Grid>
                 <Grid item>
                 <Button onClick={handleSelectTopTags} startIcon={showTopTag? (<MessageIcon/>):(<LocalOfferIcon/>)}>{showTopTag? ("Top Posts"):("Top Tags")}</Button>
-          
                 </Grid>
 
           </Grid>

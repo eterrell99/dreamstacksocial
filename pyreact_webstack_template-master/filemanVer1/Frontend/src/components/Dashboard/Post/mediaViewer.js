@@ -3,8 +3,14 @@ import { Button, Backdrop, IconButton, Container, Grid } from '@mui/material';
 import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import CloseIcon from '@mui/icons-material/Close';
+import LoadingButton from '@mui/lab/LoadingButton'
 import ReactPlayer from 'react-player';
+import SaveIcon from '@mui/icons-material/Save'; // Add this line
 import './mediaViewer.css';
+import { ButtonGroup } from '@mui/material';
+//    
+// fix media video aspect ration when scaling
+
 const mediaContainerStyle = {
   display: 'flex',
   alignItems: 'center',
@@ -14,7 +20,22 @@ const mediaContainerStyle = {
   overflow: 'hidden',
   zIndex:'1',
 };
-function ImageViewer({ files }) {
+
+const isMobileViewport = window.innerWidth <= 768;
+
+const loadingButtonIcon = () =>{ 
+  return ( <div>
+    <ButtonGroup variant="outlined" aria-label="Loading button group">
+  
+  <LoadingButton loading loadingPosition="start" startIcon={<SaveIcon />}>
+    Save
+  </LoadingButton>
+</ButtonGroup>
+</div>)
+}
+
+
+function ImageViewer({ files, expand,setExpand, toggleMediaExpanded }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [open, setOpen] = useState(false);
 
@@ -62,7 +83,7 @@ function ImageViewer({ files }) {
   };
 
   const renderMediaContent = () => {
-    if (currentFile && currentFile.file) {
+    if (currentFile) {
       const url = currentFile.file;
       if (isImageFile(url)) {
         console.log(url);
@@ -73,17 +94,30 @@ function ImageViewer({ files }) {
         console.log(url);
         console.log('video');
         return (
-          <ReactPlayer url={url} controls={true} className='react-player'/>
+          //add styling for hte video tag
+          <div>
+            {isMobileViewport ? (<ReactPlayer url={url} controls={true} playsinline={true} style={{ ...mediaContainerStyle, cursor: 'pointer', height: '50%'  }} onClick={openImage} />
+          )
+          : 
+          (<ReactPlayer url={url} controls={true} playsinline={true} style={{ ...mediaContainerStyle, cursor: 'pointer', height: '50%'  }} onClick={openImage} />
+          )}
+          </div>
+          
+          
+          //file not <ReactPlayer url={url} controls={true} width='100%' height='100%' style={{ ...mediaContainerStyle, cursor: 'pointer', objectFit: 'cover' }} onClick={openImage} />
+
+         
         );
       }
       else {
         return (
-          <Button>{isImageFile(url) ? 'image file': isVideoFile(url) ? 'videofile': 'confuse'}</Button>
+          <Button>{isImageFile(url) ? loadingButtonIcon: isVideoFile(url) ? loadingButtonIcon: loadingButtonIcon}</Button>
         );
       };
     }
     return null;
   };
+
   const mediaContent = renderMediaContent();
 
   return (
@@ -118,7 +152,7 @@ function ImageViewer({ files }) {
 
       <Backdrop open={open} onClick={closeImage}>
         <Container maxWidth="lg" style={{ height: '100%' }}>
-          <Grid container alignItems="center" style={{ height: '100%' }}>
+          <Grid container alignItems="center" justifyContent="center" style={{ height: '100%' }}>
             <Grid item xs={1}>
               <IconButton
                 onClick={(e) => {
